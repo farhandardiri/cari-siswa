@@ -144,39 +144,68 @@ async function searchStudent(studentId) {
 
 // Fungsi untuk menghitung persentase kehadiran
 function calculatePercentage(present, absent, permission, sick) {
-  const total = present + absent + permission + sick;
+  // const total = present + absent + permission + sick;
+  const total = present + absent;
   return total > 0 ? Math.round((present / total) * 100) : 0;
 }
 
-// Fungsi untuk membuat chart kehadiran
+// Fungsi untuk membuat chart kehadiran dengan angka dan persentase
 function createAttendanceChart(present, absent, permission, sick) {
   const total = present + absent + permission + sick;
-  const presentPercent = total > 0 ? (present / total) * 100 : 0;
+  const presentPercent = present > 0 ? (present / total) * 100 : 0;
   const absentPercent = total > 0 ? (absent / total) * 100 : 0;
   const permissionPercent = total > 0 ? (permission / total) * 100 : 0;
   const sickPercent = total > 0 ? (sick / total) * 100 : 0;
 
   const maxHeight = 100;
 
+  // Format angka untuk ditampilkan
+  const formatValue = (num, percent) => {
+    if (num === 0) return "";
+    return `<div>${num}</div><div class="chart-percent">${Math.round(
+      percent
+    )}%</div>`;
+  };
+
   return `
         <div class="chart-bar bg-success" style="height: ${
           (presentPercent / 100) * maxHeight
-        }%">
+        }%" 
+             data-tooltip="Hadir: ${present} hari (${Math.round(
+    presentPercent
+  )}%)">
+            <div class="chart-value">${formatValue(
+              present,
+              presentPercent
+            )}</div>
             <div class="chart-label">Hadir</div>
         </div>
         <div class="chart-bar bg-danger" style="height: ${
           (absentPercent / 100) * maxHeight
-        }%">
+        }%" 
+             data-tooltip="Alpa: ${absent} hari (${Math.round(
+    absentPercent
+  )}%)">
+            <div class="chart-value">${formatValue(absent, absentPercent)}</div>
             <div class="chart-label">Alpa</div>
         </div>
         <div class="chart-bar bg-warning" style="height: ${
           (permissionPercent / 100) * maxHeight
-        }%">
+        }%" 
+             data-tooltip="Izin: ${permission} hari (${Math.round(
+    permissionPercent
+  )}%)">
+            <div class="chart-value">${formatValue(
+              permission,
+              permissionPercent
+            )}</div>
             <div class="chart-label">Izin</div>
         </div>
         <div class="chart-bar bg-info" style="height: ${
           (sickPercent / 100) * maxHeight
-        }%">
+        }%" 
+             data-tooltip="Sakit: ${sick} hari (${Math.round(sickPercent)}%)">
+            <div class="chart-value">${formatValue(sick, sickPercent)}</div>
             <div class="chart-label">Sakit</div>
         </div>
     `;
@@ -204,10 +233,16 @@ function displayMonthlyData(monthlyData, activeMonthIndex = 0) {
   const monthData = monthlyData[activeMonthIndex];
   const percentage = calculatePercentage(
     monthData.present,
-    monthData.absent,
-    monthData.permission,
-    monthData.sick
+    monthData.absent
+    // monthData.permission,
+    // monthData.sick
   );
+  // const percentage = calculatePercentage(
+  //   monthData.present,
+  //   monthData.absent,
+  //   monthData.permission,
+  //   monthData.sick
+  // );
 
   const monthCard = `
         <div class="card month-card fade-in">

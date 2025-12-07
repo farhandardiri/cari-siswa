@@ -125,27 +125,49 @@ body {
 }
 
 .attendance-chart {
-  height: 120px;
+  height: 140px; /* Tinggi sedikit ditambah */
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
   margin-top: 1rem;
+  position: relative;
 }
 
 .chart-bar {
-  width: 40px;
+  width: 50px; /* Lebar sedikit ditambah */
   border-radius: 5px 5px 0 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.chart-bar:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.chart-value {
+  position: absolute;
+  top: -25px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .chart-label {
   position: absolute;
-  bottom: -25px;
+  bottom: -30px;
   left: 0;
   right: 0;
   text-align: center;
   font-size: 0.8rem;
   font-weight: bold;
+  color: #495057;
 }
 
 .percentage-display {
@@ -277,16 +299,65 @@ body {
   }
 
   .attendance-chart {
+    height: 120px;
+  }
+
+  .chart-bar {
+    width: 40px;
+  }
+
+  .chart-value {
+    font-size: 0.8rem;
+    top: -22px;
+  }
+
+  .chart-label {
+    font-size: 0.75rem;
+    bottom: -25px;
+  }
+}
+
+@media (max-width: 576px) {
+  .attendance-chart {
     height: 100px;
   }
 
   .chart-bar {
-    width: 30px;
+    width: 35px;
   }
 
-  .percentage-display {
-    font-size: 2rem;
+  .chart-value {
+    font-size: 0.75rem;
+    top: -20px;
   }
+
+  .chart-label {
+    font-size: 0.7rem;
+    bottom: -22px;
+  }
+}
+
+.chart-bar::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+.chart-bar:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Animation for smooth transitions */
