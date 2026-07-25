@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sistem Pencarian Data Kehadiran Siswa</title>
-     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -152,21 +152,25 @@
                       Keseluruhan
                     </h5>
                     <div class="row text-center">
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <h4 id="totalPresent">0</h4>
                         <small>Total Hadir</small>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <h4 id="totalAbsent">0</h4>
                         <small>Total Alpa</small>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <h4 id="totalPermission">0</h4>
                         <small>Total Izin</small>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <h4 id="totalSick">0</h4>
                         <small>Total Sakit</small>
+                      </div>
+                      <div class="col-md-2">
+                        <h4 id="totalLate">0</h4>
+                        <small>Total Terlambat</small>
                       </div>
                     </div>
                   </div>
@@ -181,6 +185,11 @@
               <!-- Data Per Bulan -->
               <div id="monthlyData">
                 <!-- Data bulanan akan diisi oleh JavaScript -->
+              </div>
+
+              <!-- Container untuk Total Per Kegiatan -->
+              <div id="totalPerActivity">
+                <!-- Total per kegiatan akan diisi oleh JavaScript -->
               </div>
             </div>
           </div>
@@ -203,14 +212,37 @@
                   <ol>
                     <li>Masukkan NIUP santri pada form pencarian</li>
                     <li>Klik tombol "Cari Data"</li>
-                    <li>Data kehadiran akan ditampilkan per bulan</li>
+                    <li>Data kehadiran akan ditampilkan per kegiatan</li>
                     <li>
                       Gunakan tombol bulan untuk melihat data bulan tertentu
                     </li>
                   </ol>
                 </div>
                 <div class="col-md-6">
-                  <h6>Keterangan:</h6>
+                  <h6>Jenis Kegiatan:</h6>
+                  <ul>
+                    <li>
+                      <span class="badge badge-primary"
+                        ><i class="fas fa-book me-1"></i>KBM</span
+                      >
+                      - Kegiatan Belajar Mengajar
+                    </li>
+                    <li>
+                      <span class="badge badge-success"
+                        ><i class="fas fa-hand-holding-heart me-1"></i
+                        >Pembiasaan Karakter Baik</span
+                      >
+                      - Pembinaan karakter santri
+                    </li>
+                    <li>
+                      <span class="badge badge-info"
+                        ><i class="fas fa-mosque me-1"></i>Sholat
+                        Berjama'ah</span
+                      >
+                      - Kegiatan ibadah sholat berjamaah
+                    </li>
+                  </ul>
+                  <h6 class="mt-2">Keterangan:</h6>
                   <ul>
                     <li><strong>Kehadiran</strong>: Jumlah jam siswa hadir</li>
                     <li>
@@ -218,12 +250,15 @@
                       keterangan
                     </li>
                     <li>
-                      <strong>Izin</strong>: Jumlah jam siswa tidak hadir
-                      dengan izin
+                      <strong>Izin</strong>: Jumlah jam siswa tidak hadir dengan
+                      izin
                     </li>
                     <li>
                       <strong>Sakit</strong>: Jumlah jam siswa tidak hadir
                       karena sakit
+                    </li>
+                    <li>
+                      <strong>Terlambat</strong>: Jumlah jam siswa terlambat
                     </li>
                   </ul>
                 </div>
@@ -237,9 +272,7 @@
     <!-- Footer -->
     <div class="footer text-center mt-5">
       <div class="container">
-        <p>
-          &copy; 2025 MTsNJ
-        </p>
+        <p>&copy; 2025 MTsNJ</p>
       </div>
     </div>
 

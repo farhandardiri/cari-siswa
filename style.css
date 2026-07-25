@@ -10,12 +10,12 @@ body {
   border-radius: 0 0 20px 20px;
   margin-bottom: 2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
   position: relative;
   min-height: 140px;
   display: flex;
   align-items: center;
 }
+
 /* Logo Styles */
 .logo-container {
   display: flex;
@@ -29,6 +29,11 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .header-content {
@@ -95,12 +100,7 @@ body {
   }
 }
 
-/* Hover effect untuk logo */
-.logo:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
+/* Cards */
 .card {
   border-radius: 15px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
@@ -124,8 +124,9 @@ body {
   display: none;
 }
 
+/* Attendance Chart */
 .attendance-chart {
-  height: 140px; /* Tinggi sedikit ditambah */
+  height: 140px;
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
@@ -134,13 +135,14 @@ body {
 }
 
 .chart-bar {
-  width: 50px; /* Lebar sedikit ditambah */
+  width: 50px;
   border-radius: 5px 5px 0 0;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
+  cursor: help;
 }
 
 .chart-bar:hover {
@@ -165,17 +167,43 @@ body {
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
   color: #495057;
 }
 
+/* Chart Tooltip */
+.chart-bar::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+.chart-bar:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Percentage Display */
 .percentage-display {
   font-size: 2.5rem;
   font-weight: bold;
   color: #2ecc71;
 }
 
+/* Button Search */
 .btn-search {
   background: linear-gradient(135deg, #3498db, #8e44ad);
   border: none;
@@ -183,13 +211,16 @@ body {
   border-radius: 50px;
   font-weight: bold;
   transition: all 0.3s;
+  color: white;
 }
 
 .btn-search:hover {
   transform: scale(1.05);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  color: white;
 }
 
+/* Footer */
 .footer {
   margin-top: 3rem;
   padding: 1.5rem 0;
@@ -198,6 +229,7 @@ body {
   border-radius: 20px 20px 0 0;
 }
 
+/* Info Box */
 .info-box {
   background: linear-gradient(135deg, #2ecc71, #3498db);
   color: white;
@@ -206,6 +238,7 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Month Card */
 .month-card {
   border-left: 5px solid #3498db;
 }
@@ -219,8 +252,53 @@ body {
 .badge-month {
   background: linear-gradient(135deg, #3498db, #8e44ad);
   font-size: 0.9rem;
+  color: white;
 }
 
+/* Badge Activity */
+.badge-activity {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.badge-activity:hover {
+  transform: scale(1.05);
+}
+
+/* Badge Colors */
+.badge-primary {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  color: white;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  color: white;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #1abc9c, #16a085) !important;
+  color: white;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+  color: white;
+}
+
+.badge-secondary {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  color: white;
+}
+
+/* Chart Bar Backgrounds */
+.chart-bar.bg-secondary {
+  background: linear-gradient(135deg, #6c757d, #495057) !important;
+}
+
+/* Month Selector */
 .month-selector {
   display: flex;
   justify-content: center;
@@ -247,12 +325,14 @@ body {
   color: white;
 }
 
+/* Loading Spinner */
 .loading-spinner {
   display: none;
   text-align: center;
   padding: 2rem;
 }
 
+/* Total Stats */
 .total-stats {
   background: linear-gradient(135deg, #f39c12, #e74c3c);
   color: white;
@@ -261,10 +341,12 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Progress Bar */
 .progress {
   border-radius: 10px;
 }
 
+/* Tables */
 .table-borderless th {
   font-weight: 600;
   color: #495057;
@@ -274,7 +356,24 @@ body {
   color: #6c757d;
 }
 
-/* Responsive adjustments */
+.table-borderless th i {
+  width: 20px;
+}
+
+.table-borderless td strong {
+  color: #2c3e50;
+}
+
+/* Badge Indicators */
+.badge.bg-danger.ms-1,
+.badge.bg-warning.ms-1,
+.badge.bg-secondary.ms-1,
+.badge.bg-info.ms-1 {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .header {
     padding: 1.5rem 0;
@@ -312,8 +411,16 @@ body {
   }
 
   .chart-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     bottom: -25px;
+  }
+
+  .total-stats .col-md-2 {
+    margin-bottom: 1rem;
+  }
+
+  .total-stats .col-md-2:last-child {
+    margin-bottom: 0;
   }
 }
 
@@ -327,40 +434,45 @@ body {
   }
 
   .chart-value {
-    font-size: 0.75rem;
-    top: -20px;
+    font-size: 0.7rem;
+    top: -18px;
   }
 
   .chart-label {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     bottom: -22px;
+  }
+
+  .badge-activity {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    display: inline-block;
+  }
+
+  .badge.ms-1 {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 0.6rem;
+  }
+
+  .month-card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .month-card-header .text-muted {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .month-card-header .text-success,
+  .month-card-header .text-warning,
+  .month-card-header .text-danger {
+    font-size: 0.85rem;
   }
 }
 
-.chart-bar::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s;
-  z-index: 1000;
-}
-
-.chart-bar:hover::after {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Animation for smooth transitions */
+/* Animations */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -376,7 +488,7 @@ body {
   }
 }
 
-/* Custom scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -394,4 +506,16 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Utility */
+.text-success,
+.text-warning,
+.text-danger {
+  font-weight: 500;
+}
+
+/* Legend untuk chart */
+.attendance-chart + .row small {
+  font-size: 0.7rem;
 }
