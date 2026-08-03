@@ -5,7 +5,7 @@ const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbxWZw0YmJ1Mhb2vS3nv4Pc4mrazt3TCJo-UV1fuOa9Y7GoMTRK3koRmmsVWlws_ANIT8A/exec";
 
 // FLAG untuk menggunakan data dummy (true = pakai dummy, false = pakai API)
-const USE_DUMMY_DATA = true;
+const USE_DUMMY_DATA = false;
 
 // Fungsi untuk mengkonversi jam ke hari berdasarkan jenis kegiatan
 function convertToDays(hours, activityType) {
