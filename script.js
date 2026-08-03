@@ -5,7 +5,7 @@ const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbxWZw0YmJ1Mhb2vS3nv4Pc4mrazt3TCJo-UV1fuOa9Y7GoMTRK3koRmmsVWlws_ANIT8A/exec";
 
 // FLAG untuk menggunakan data dummy (true = pakai dummy, false = pakai API)
-const USE_DUMMY_DATA = false;
+const USE_DUMMY_DATA = true;
 
 // Fungsi untuk mengkonversi jam ke hari berdasarkan jenis kegiatan
 function convertToDays(hours, activityType) {
@@ -111,7 +111,7 @@ function formatDays(days) {
 // DATA DUMMY
 const DUMMY_DATA = [
   {
-    id: "12620522626",
+    id: "111",
     name: "ACHMAD IQBAL NUSANTARA",
     class: "FA 1",
     year: "2025/2026",
@@ -152,7 +152,7 @@ const DUMMY_DATA = [
     ],
   },
   {
-    id: "12520321230",
+    id: "222",
     name: "Sulthon Muzakky Amrullah Al Ikhwan",
     class: "VII AGAMA 1",
     year: "2025",
@@ -219,7 +219,7 @@ const DUMMY_DATA = [
     ],
   },
   {
-    id: "2023002",
+    id: "333",
     name: "Siti Rahayu",
     class: "X IPA 2",
     year: "2023/2024",
@@ -544,27 +544,27 @@ function createAttendanceChart(present, absent, permission, sick, late) {
     <div class="chart-bar bg-success" style="height: ${(presentPercent / 100) * maxHeight}%" 
          data-tooltip="Hadir: ${present} jam (${Math.round(presentPercent)}%)">
       <div class="chart-value">${formatValue(present, presentPercent)}</div>
-      <div class="chart-label">Hadir</div>
+      <div class="chart-label mb-3">Hadir</div>
     </div>
     <div class="chart-bar bg-danger" style="height: ${(absentPercent / 100) * maxHeight}%" 
          data-tooltip="Alpa: ${absent} jam (${Math.round(absentPercent)}%)">
       <div class="chart-value">${formatValue(absent, absentPercent)}</div>
-      <div class="chart-label">Alpa</div>
+      <div class="chart-label mb-3">Alpa</div>
     </div>
     <div class="chart-bar bg-warning" style="height: ${(permissionPercent / 100) * maxHeight}%" 
          data-tooltip="Izin: ${permission} jam (${Math.round(permissionPercent)}%)">
       <div class="chart-value">${formatValue(permission, permissionPercent)}</div>
-      <div class="chart-label">Izin</div>
+      <div class="chart-label mb-3">Izin</div>
     </div>
     <div class="chart-bar bg-info" style="height: ${(sickPercent / 100) * maxHeight}%" 
          data-tooltip="Sakit: ${sick} jam (${Math.round(sickPercent)}%)">
       <div class="chart-value">${formatValue(sick, sickPercent)}</div>
-      <div class="chart-label">Sakit</div>
+      <div class="chart-label mb-3">Sakit</div>
     </div>
     <div class="chart-bar bg-secondary" style="height: ${(latePercent / 100) * maxHeight}%" 
          data-tooltip="Terlambat: ${late} jam (${Math.round(latePercent)}%)">
       <div class="chart-value">${formatValue(late, latePercent)}</div>
-      <div class="chart-label">Terlambat</div>
+      <div class="chart-label mb-3"><small>Terlambat</small></div>
     </div>
   `;
 }
@@ -658,15 +658,15 @@ function getActivityBadgeColor(activity) {
 // Fungsi mendapatkan info konversi
 function getActivityHoursInfo(activity) {
   const lowerActivity = activity.toLowerCase();
-  if (lowerActivity.includes("kbm")) {
-    return "1 hari = 8 jam";
-  } else if (
-    lowerActivity.includes("pembiasaan") ||
-    lowerActivity.includes("pkb") ||
-    lowerActivity.includes("sholat")
-  ) {
-    return "1 hari = 1 jam";
-  }
+  // if (lowerActivity.includes("kbm")) {
+  //   return "1 hari = 8 jam";
+  // } else if (
+  //   lowerActivity.includes("pembiasaan") ||
+  //   lowerActivity.includes("pkb") ||
+  //   lowerActivity.includes("sholat")
+  // ) {
+  //   return "1 hari = 1 jam";
+  // }
   return "";
 }
 
@@ -743,8 +743,7 @@ function displayTotalStatistics(totals, hariAktif = null) {
               <h3>${totals.present} jam</h3>
               <small>
                 ${formatDays(totals.correctPresentDays || totals.presentDays)}
-                <br>
-                <span class="text-warning">* Berdasarkan 1 hari = 10 jam (KBM 8j + PKB 1j + Sholat 1j)</span>
+                
               </small>
             </div>
           </div>
@@ -771,7 +770,7 @@ function displayTotalStatistics(totals, hariAktif = null) {
           </div>
         </div>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6 mb-3">
             <div class="stat-box bg-secondary text-white rounded p-3 text-center">
               <h6><i class="fas fa-clock me-2"></i>Total Terlambat</h6>
               <h3>${totals.late} jam</h3>
@@ -807,68 +806,7 @@ function displayTotalStatistics(totals, hariAktif = null) {
             : ""
         }
         
-        <div class="row mt-3">
-          <div class="col-12">
-            <div class="card bg-light">
-              <div class="card-body">
-                <h6><i class="fas fa-table me-2"></i>Rekapitulasi Total</h6>
-                <div class="table-responsive">
-                  <table class="table table-sm table-bordered">
-                    <thead class="table-dark">
-                      <tr>
-                        <th>Keterangan</th>
-                        <th>Jam</th>
-                        <th>Hari (Per Kegiatan)</th>
-                        <th>Hari (Gabungan)*</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="table-success">
-                        <td><i class="fas fa-check-circle me-1"></i>Hadir</td>
-                        <td><strong>${totals.present}</strong></td>
-                        <td>${formatDays(totals.presentDays)}</td>
-                        <td><strong>${formatDays(totals.correctPresentDays || totals.presentDays)}</strong></td>
-                      </tr>
-                      <tr class="table-danger">
-                        <td><i class="fas fa-times-circle me-1"></i>Alpa</td>
-                        <td>${totals.absent}</td>
-                        <td>${formatDays(totals.absentDays)}</td>
-                        <td>-</td>
-                      </tr>
-                      <tr class="table-warning">
-                        <td><i class="fas fa-file-alt me-1"></i>Izin</td>
-                        <td>${totals.permission}</td>
-                        <td>${formatDays(totals.permissionDays)}</td>
-                        <td>-</td>
-                      </tr>
-                      <tr class="table-info">
-                        <td><i class="fas fa-ambulance me-1"></i>Sakit</td>
-                        <td>${totals.sick}</td>
-                        <td>${formatDays(totals.sickDays)}</td>
-                        <td>-</td>
-                      </tr>
-                      <tr class="table-secondary">
-                        <td><i class="fas fa-clock me-1"></i>Terlambat</td>
-                        <td>${totals.late}</td>
-                        <td>${formatDays(totals.lateDays)}</td>
-                        <td>-</td>
-                      </tr>
-                      <tr class="table-primary">
-                        <td><strong><i class="fas fa-calculator me-1"></i>Total Efektif</strong></td>
-                        <td><strong>${totals.present + totals.absent + totals.permission}</strong></td>
-                        <td><strong>${formatDays(totals.presentDays + totals.absentDays + totals.permissionDays)}</strong></td>
-                        <td><strong>${formatDays(totals.correctPresentDays || totals.presentDays)}</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <small class="text-muted">
-                    * 1 hari = 8 jam KBM + 1 jam PKB + 1 jam Sholat = 10 jam/hari
-                  </small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+       
       </div>
     </div>
   `;
@@ -895,20 +833,17 @@ function displayTotalPerActivity(activities, hariAktif = null) {
 
   let html = `
     <div class="card mt-4">
-      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center mb-1">
         <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Total Per Kegiatan</h5>
-        <small class="text-light">
-          <i class="fas fa-arrows-alt-h me-1"></i>
-          ${isMobile ? "Geser untuk melihat semua" : ""}
-        </small>
+      
       </div>
       <div class="card-body p-0">
         <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
           <table class="table table-striped table-hover mb-0" style="min-width: ${isMobile ? "650px" : "auto"};">
             <thead class="table-dark">
               <tr>
-                <th style="position: sticky; left: 0; background: #212529; z-index: 2; min-width: 45px;">No</th>
-                <th style="position: sticky; left: 45px; background: #212529; z-index: 2; min-width: ${isMobile ? "100px" : "auto"};">Kegiatan</th>
+                <th style="position: sticky; left: 0; background: #212529; z-index: 2; min-width: 20px;">No</th>
+                <th style="position: sticky; left: 16px; background: #212529; z-index: 2; width: ${isMobile ? "30px" : "auto"};">Kegiatan</th>
                 ${
                   !isMobile
                     ? `
@@ -923,7 +858,7 @@ function displayTotalPerActivity(activities, hariAktif = null) {
                 `
                 }
                 <th>Jml Bulan</th>
-                <th style="min-width: ${isMobile ? "100px" : "auto"};">Rata-rata %</th>
+                <th style="min-width: ${isMobile ? "120px" : "auto"};">Rata-rata %</th>
                 ${!isMobile ? `<th>Detail</th>` : ""}
               </tr>
             </thead>
@@ -985,36 +920,36 @@ function displayTotalPerActivity(activities, hariAktif = null) {
     html += `
       <tr>
         <td style="position: sticky; left: 0; background: white; z-index: 1; font-weight: bold;">${index + 1}</td>
-        <td style="position: sticky; left: 45px; background: white; z-index: 1;">
-          <span class="badge ${badgeColor} badge-activity" style="font-size: ${isMobile ? "0.6rem" : "0.85rem"};">
+        <td style="position: sticky; left: 10px; background: white; z-index: 1;">
+          <span class="badge ${badgeColor} badge-activity" style="font-size: ${isMobile ? "0.4rem" : "0.85rem"};">
             <i class="fas ${icon} me-1"></i>${isMobile ? item.activity.substring(0, 15) + (item.activity.length > 15 ? "..." : "") : item.activity}
           </span>
           <br>
           <small class="text-muted" style="font-size: ${isMobile ? "0.55rem" : "0.75rem"};">${hoursInfo}</small>
-          ${activeDays ? `<br><small class="text-primary" style="font-size: ${isMobile ? "0.5rem" : "0.7rem"};">Hari aktif: ${activeDays}</small>` : ""}
+          ${activeDays ? `<small class="text-primary" style="font-size: ${isMobile ? "0.5rem" : "0.7rem"};">Hari aktif: ${activeDays}</small>` : ""}
         </td>
         ${
           !isMobile
             ? `
         <td>
           <strong>${item.present}</strong> jam<br>
-          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.presentDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">${formatDays(item.presentDays)}</small>
         </td>
         <td>
           ${item.absent} jam<br>
-          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.absentDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">${formatDays(item.absentDays)}</small>
         </td>
         <td>
           ${item.permission} jam<br>
-          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.permissionDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">${formatDays(item.permissionDays)}</small>
         </td>
         <td>
           ${item.sick} jam<br>
-          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.sickDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">${formatDays(item.sickDays)}</small>
         </td>
         <td>
           ${item.late} jam<br>
-          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.lateDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">${formatDays(item.lateDays)}</small>
         </td>
         `
             : `
@@ -1055,13 +990,7 @@ function displayTotalPerActivity(activities, hariAktif = null) {
         ${
           isMobile
             ? `
-        <div class="p-2 bg-light border-top">
-          <small class="text-muted d-flex justify-content-between">
-            <span>✔ = Hadir</span>
-            <span>✘ = Alpa</span>
-            <span>📝 = Izin</span>
-          </small>
-        </div>
+       
         `
             : ""
         }
@@ -1185,15 +1114,15 @@ function displayMonthlyData(activities, activeMonth = null, hariAktif = null) {
               <table class="table table-borderless">
                 <tr>
                   <th width="60%"><i class="fas fa-check-circle text-success me-1"></i>Kehadiran:</th>
-                  <td><strong>${activity.present} jam</strong> <span class="text-muted">(${presentDisplay})</span></td>
+                  <td><strong>${activity.present} jam</strong> <span class="text-muted"><small>- ${presentDisplay}</small></span></td>
                 </tr>
                 <tr>
                   <th><i class="fas fa-times-circle text-danger me-1"></i>Alpa:</th>
-                  <td>${activity.absent} jam <span class="text-muted">(${absentDisplay})</span> </td>
+                  <td>${activity.absent} jam <span class="text-muted"><small>- ${absentDisplay}</small></span> </td>
                 </tr>
                 <tr>
                   <th><i class="fas fa-clock text-secondary me-1"></i>Terlambat:</th>
-                  <td>${activity.late || 0} jam <span class="text-muted">(${lateDisplay})</span> </td>
+                  <td>${activity.late || 0} jam <span class="text-muted"><small>- ${lateDisplay}</small></span> </td>
                 </tr>
               </table>
             </div>
@@ -1201,11 +1130,11 @@ function displayMonthlyData(activities, activeMonth = null, hariAktif = null) {
               <table class="table table-borderless">
                 <tr>
                   <th width="60%"><i class="fas fa-file-alt text-warning me-1"></i>Izin:</th>
-                  <td>${activity.permission} jam <span class="text-muted">(${permissionDisplay})</span> </td>
+                  <td>${activity.permission} jam <span class="text-muted"><small>- ${permissionDisplay}</small></span> </td>
                 </tr>
                 <tr>
                   <th><i class="fas fa-ambulance text-info me-1"></i>Sakit:</th>
-                  <td>${activity.sick} jam <span class="text-muted">(${sickDisplay})</span> </td>
+                  <td>${activity.sick} jam <span class="text-muted"><small>- ${sickDisplay}</small></span> </td>
                 </tr>
                 <tr>
                   <th><i class="fas fa-calculator text-primary me-1"></i>Total Efektif:</th>
@@ -1313,9 +1242,9 @@ function createMonthSelector(activities, activeMonth = null, hariAktif = null) {
     let monthLabel = `📅 ${month}`;
     if (hariAktif) {
       const activeDays = getActiveDaysForMonth(hariAktif, month);
-      if (activeDays !== null) {
-        monthLabel += ` (${activeDays} hari)`;
-      }
+      // if (activeDays !== null) {
+      //   monthLabel += ` (${activeDays} hari)`;
+      // }
     }
     button.textContent = monthLabel;
 
