@@ -1,11 +1,15 @@
-// Konfigurasi Google Sheets - GANTI DENGAN DATA ANDA
-const SPREADSHEET_ID = "1PlYtWISua88svLpf5HqVNCHxo89zrNiikrT6bSiDAfk"; // Ganti dengan ID spreadsheet Anda
-const API_KEY = "AIzaSyDEif5uDoVmYUxrthp8AT1v3aurWdJgLfo"; // Ganti dengan API key Anda
+// script.js - Perbaikan perhitungan hari total dan mobile responsive
+
+// Konfigurasi Google Apps Script Web App
+const WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbxWZw0YmJ1Mhb2vS3nv4Pc4mrazt3TCJo-UV1fuOa9Y7GoMTRK3koRmmsVWlws_ANIT8A/exec";
+
+// FLAG untuk menggunakan data dummy (true = pakai dummy, false = pakai API)
+const USE_DUMMY_DATA = false;
 
 // Fungsi untuk mengkonversi jam ke hari berdasarkan jenis kegiatan
 function convertToDays(hours, activityType) {
-  let hoursPerDay = 1; // default
-
+  let hoursPerDay = 1;
   const lowerActivity = activityType.toLowerCase();
   if (lowerActivity.includes("kbm")) {
     hoursPerDay = 8;
@@ -16,12 +20,86 @@ function convertToDays(hours, activityType) {
   ) {
     hoursPerDay = 1;
   }
-
   const days = hours / hoursPerDay;
   return days;
 }
 
-// Fungsi untuk format tampilan hari dengan 1 desimal
+// FUNGSI BARU: Konversi jam ke hari berdasarkan kombinasi kegiatan dalam sehari
+function convertHoursToDaysByActivity(hours, activityType, hariAktif) {
+  const activeDays = hariAktif || 22;
+  let hoursPerDay = 1;
+  const lowerActivity = activityType.toLowerCase();
+  if (lowerActivity.includes("kbm")) {
+    hoursPerDay = 8;
+  } else if (
+    lowerActivity.includes("pembiasaan") ||
+    lowerActivity.includes("pkb") ||
+    lowerActivity.includes("sholat")
+  ) {
+    hoursPerDay = 1;
+  }
+  const days = hours / hoursPerDay;
+  return Math.min(days, activeDays);
+}
+
+// FUNGSI BARU: Menghitung total hari keseluruhan dengan benar
+function calculateTotalDays(activities, hariAktif) {
+  const monthlyData = {};
+
+  activities.forEach((act) => {
+    if (!monthlyData[act.month]) {
+      monthlyData[act.month] = {
+        kbm: 0,
+        pkb: 0,
+        sholat: 0,
+        other: 0,
+      };
+    }
+
+    const lowerActivity = act.activity.toLowerCase();
+    if (lowerActivity.includes("kbm")) {
+      monthlyData[act.month].kbm += act.present || 0;
+    } else if (
+      lowerActivity.includes("pembiasaan") ||
+      lowerActivity.includes("pkb")
+    ) {
+      monthlyData[act.month].pkb += act.present || 0;
+    } else if (lowerActivity.includes("sholat")) {
+      monthlyData[act.month].sholat += act.present || 0;
+    } else {
+      monthlyData[act.month].other += act.present || 0;
+    }
+  });
+
+  let totalDays = 0;
+  let totalHours = 0;
+
+  for (const [month, data] of Object.entries(monthlyData)) {
+    let activeDays = 22;
+    if (hariAktif) {
+      const foundDays = getActiveDaysForMonth(hariAktif, month);
+      if (foundDays !== null) {
+        activeDays = foundDays;
+      }
+    }
+
+    const hoursPerDay = 8 + 1 + 1;
+    const totalHoursInMonth = data.kbm + data.pkb + data.sholat + data.other;
+    const daysInMonth = totalHoursInMonth / hoursPerDay;
+    const limitedDays = Math.min(daysInMonth, activeDays);
+
+    totalDays += limitedDays;
+    totalHours += totalHoursInMonth;
+  }
+
+  return {
+    totalDays: totalDays,
+    totalHours: totalHours,
+    monthlyBreakdown: monthlyData,
+  };
+}
+
+// Fungsi untuk format tampilan hari
 function formatDays(days) {
   if (days === 0) return "0 hari";
   if (Number.isInteger(days)) {
@@ -30,41 +108,113 @@ function formatDays(days) {
   return days.toFixed(1) + " hari";
 }
 
-// Data dummy untuk development (jika tidak menggunakan Google Sheets)
+// DATA DUMMY
 const DUMMY_DATA = [
+  {
+    id: "12620522626",
+    name: "ACHMAD IQBAL NUSANTARA",
+    class: "FA 1",
+    year: "2025/2026",
+    status: "Aktif",
+    hari_aktif: {
+      agustus: 22,
+    },
+    activities: [
+      {
+        month: "Agustus",
+        activity: "Pembiasaan Karakter Baik",
+        present: 22,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
+        detail: [],
+      },
+      {
+        month: "Agustus",
+        activity: "Sholat Berjama'ah",
+        present: 22,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
+        detail: [],
+      },
+      {
+        month: "Agustus",
+        activity: "KBM",
+        present: 172,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
+      },
+    ],
+  },
   {
     id: "12520321230",
     name: "Sulthon Muzakky Amrullah Al Ikhwan",
     class: "VII AGAMA 1",
     year: "2025",
     status: "Aktif",
+    hari_aktif: {
+      agustus: 22,
+      september: 20,
+    },
     activities: [
       {
-        month: "Oktober",
+        month: "Agustus",
         activity: "KBM",
-        present: 200,
-        absent: 0,
-        permission: 0,
+        present: 150,
+        absent: 2,
+        permission: 1,
         sick: 0,
-        late: 20,
+        late: 3,
       },
       {
-        month: "Oktober",
+        month: "Agustus",
         activity: "Pembiasaan Karakter Baik",
-        present: 30,
-        absent: 0,
+        present: 18,
+        absent: 1,
         permission: 0,
         sick: 0,
-        late: 2,
+        late: 1,
       },
       {
-        month: "Oktober",
+        month: "Agustus",
         activity: "Sholat Berjama'ah",
-        present: 40,
+        present: 19,
         absent: 0,
         permission: 0,
         sick: 0,
-        late: 5,
+        late: 1,
+      },
+      {
+        month: "September",
+        activity: "KBM",
+        present: 160,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
+      },
+      {
+        month: "September",
+        activity: "Pembiasaan Karakter Baik",
+        present: 20,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
+      },
+      {
+        month: "September",
+        activity: "Sholat Berjama'ah",
+        present: 20,
+        absent: 0,
+        permission: 0,
+        sick: 0,
+        late: 0,
       },
     ],
   },
@@ -74,20 +224,24 @@ const DUMMY_DATA = [
     class: "X IPA 2",
     year: "2023/2024",
     status: "Aktif",
+    hari_aktif: {
+      januari: 22,
+      februari: 20,
+    },
     activities: [
       {
         month: "Januari",
         activity: "KBM",
-        present: 19,
-        absent: 1,
-        permission: 1,
+        present: 150,
+        absent: 2,
+        permission: 0,
         sick: 0,
-        late: 1,
+        late: 2,
       },
       {
         month: "Januari",
         activity: "Pembiasaan Karakter Baik",
-        present: 14,
+        present: 18,
         absent: 0,
         permission: 0,
         sick: 0,
@@ -105,6 +259,15 @@ const DUMMY_DATA = [
       {
         month: "Februari",
         activity: "KBM",
+        present: 170,
+        absent: 0,
+        permission: 1,
+        sick: 0,
+        late: 0,
+      },
+      {
+        month: "Februari",
+        activity: "Pembiasaan Karakter Baik",
         present: 20,
         absent: 0,
         permission: 0,
@@ -113,17 +276,8 @@ const DUMMY_DATA = [
       },
       {
         month: "Februari",
-        activity: "Pembiasaan Karakter Baik",
-        present: 18,
-        absent: 0,
-        permission: 1,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "Februari",
         activity: "Sholat Berjama'ah",
-        present: 22,
+        present: 20,
         absent: 0,
         permission: 0,
         sick: 0,
@@ -133,99 +287,103 @@ const DUMMY_DATA = [
   },
 ];
 
-// Fungsi untuk mengambil data dari Google Sheets
-async function fetchSheetData(range) {
-  try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.values;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return null;
-  }
-}
-
-// Fungsi untuk mencari data siswa dari 1 sheet
 async function searchStudent(studentId) {
-  // Tampilkan loading spinner
-  document.getElementById("loadingSpinner").style.display = "block";
-  document.querySelector(".result-box").style.display = "none";
+  const spinner = document.getElementById("loadingSpinner");
+  const resultBox = document.querySelector(".result-box");
+
+  if (spinner) spinner.style.display = "block";
+  if (resultBox) resultBox.style.display = "none";
 
   try {
-    // Coba ambil data dari Google Sheets
-    const allData = await fetchSheetData("A2:L");
+    let student = null;
+    let hariAktif = null;
 
-    let student;
+    if (USE_DUMMY_DATA) {
+      console.log("Menggunakan data dummy untuk testing...");
 
-    if (allData) {
-      // Filter data untuk siswa dengan NIUP yang dicari
-      const studentRecords = allData.filter((row) => row[0] === studentId);
+      const foundStudent = DUMMY_DATA.find((s) => s.id === studentId);
 
-      if (studentRecords.length === 0) {
-        document.getElementById("loadingSpinner").style.display = "none";
-        return null;
+      if (foundStudent) {
+        student = JSON.parse(JSON.stringify(foundStudent));
+        hariAktif = student.hari_aktif || null;
+
+        if (student.activities) {
+          student.activities.forEach((act) => {
+            act.presentDays = convertToDays(act.present, act.activity);
+            act.absentDays = convertToDays(act.absent, act.activity);
+            act.permissionDays = convertToDays(act.permission, act.activity);
+            act.sickDays = convertToDays(act.sick, act.activity);
+            act.lateDays = convertToDays(act.late, act.activity);
+
+            if (!act.detail) {
+              act.detail = [];
+            }
+          });
+        }
       }
+    } else {
+      const response = await fetch(`${WEB_APP_URL}?niup=${studentId}`);
+      const data = await response.json();
 
-      // Ambil data dasar siswa dari record pertama
-      const firstRecord = studentRecords[0];
-      student = {
-        id: firstRecord[0],
-        name: firstRecord[1],
-        class: firstRecord[2],
-        year: firstRecord[4],
-        status: firstRecord[5],
-        activities: [],
-      };
+      console.log("Response API:", data);
 
-      // Proses data kegiatan dengan konversi nama kegiatan
-      studentRecords.forEach((record) => {
-        let activityName = record[3]; // kolom kegiatan
+      if (
+        data.status === "success" &&
+        Array.isArray(data.data) &&
+        data.data.length > 0
+      ) {
+        student = data.data[0];
 
-        // Konversi nama kegiatan jika diperlukan
-        if (activityName === "pkb" || activityName === "PKB") {
-          activityName = "Pembiasaan Karakter Baik";
-        } else if (activityName === "sholat" || activityName === "Sholat") {
-          activityName = "Sholat Berjama'ah";
+        if (data.hari_aktif) {
+          hariAktif = data.hari_aktif;
         }
 
-        const presentHours = parseInt(record[7]) || 0;
-        const sickHours = parseInt(record[8]) || 0;
-        const permissionHours = parseInt(record[9]) || 0;
-        const absentHours = parseInt(record[10]) || 0;
-        const lateHours = parseInt(record[11]) || 0;
+        if (student && student.activities) {
+          student.activities.forEach((act) => {
+            act.presentDays = convertToDays(act.present, act.activity);
+            act.absentDays = convertToDays(act.absent, act.activity);
+            act.permissionDays = convertToDays(act.permission, act.activity);
+            act.sickDays = convertToDays(act.sick, act.activity);
+            act.lateDays = convertToDays(act.late, act.activity);
 
-        student.activities.push({
-          month: record[6],
-          activity: activityName,
-          present: presentHours,
-          sick: sickHours,
-          permission: permissionHours,
-          absent: absentHours,
-          late: lateHours,
-          // Konversi ke hari
-          presentDays: convertToDays(presentHours, activityName),
-          sickDays: convertToDays(sickHours, activityName),
-          permissionDays: convertToDays(permissionHours, activityName),
-          absentDays: convertToDays(absentHours, activityName),
-          lateDays: convertToDays(lateHours, activityName),
-        });
-      });
-    } else {
-      // Gunakan data dummy
-      student = DUMMY_DATA.find((s) => s.id === studentId);
-      if (!student) {
-        document.getElementById("loadingSpinner").style.display = "none";
+            if (!act.detail) {
+              act.detail = [];
+            }
+          });
+        }
+      } else if (data.id && !data.error) {
+        student = data;
+
+        if (student.activities) {
+          student.activities.forEach((act) => {
+            act.presentDays = convertToDays(act.present, act.activity);
+            act.absentDays = convertToDays(act.absent, act.activity);
+            act.permissionDays = convertToDays(act.permission, act.activity);
+            act.sickDays = convertToDays(act.sick, act.activity);
+            act.lateDays = convertToDays(act.late, act.activity);
+
+            if (!act.detail) {
+              act.detail = [];
+            }
+          });
+        }
+      } else if (data.error) {
+        console.error("Error dari API:", data.error);
+        if (spinner) spinner.style.display = "none";
         return null;
       }
     }
 
-    // Kelompokkan aktivitas berdasarkan bulan
+    if (!student) {
+      console.log("Siswa tidak ditemukan untuk ID:", studentId);
+      if (spinner) spinner.style.display = "none";
+      return null;
+    }
+
+    if (hariAktif) {
+      student.hari_aktif = hariAktif;
+    }
+
     const monthOrder = [
       "Januari",
       "Februari",
@@ -241,31 +399,133 @@ async function searchStudent(studentId) {
       "Desember",
     ];
 
-    // Urutkan aktivitas berdasarkan bulan
-    student.activities.sort((a, b) => {
-      return monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month);
-    });
+    if (student.activities) {
+      student.activities.sort((a, b) => {
+        return monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month);
+      });
+    }
 
-    document.getElementById("loadingSpinner").style.display = "none";
+    console.log("Data siswa berhasil diproses:", student);
+    if (spinner) spinner.style.display = "none";
     return student;
   } catch (error) {
-    console.error("Error processing student data:", error);
-    document.getElementById("loadingSpinner").style.display = "none";
+    console.error("Error fetching student data:", error);
+    if (spinner) spinner.style.display = "none";
     return null;
   }
 }
 
-// Fungsi untuk menghitung persentase kehadiran
-// HANYA ALPA DAN IZIN YANG MENGURANGI PERSENTASE
+// FUNGSI BARU: Menghitung total statistik dengan perhitungan hari yang benar
+function calculateTotalStats(activities, hariAktif = null) {
+  const totals = activities.reduce(
+    (totals, activity) => {
+      totals.present += activity.present;
+      totals.absent += activity.absent;
+      totals.permission += activity.permission;
+      totals.sick += activity.sick;
+      totals.late += activity.late || 0;
+
+      totals.presentDays += activity.presentDays || 0;
+      totals.absentDays += activity.absentDays || 0;
+      totals.permissionDays += activity.permissionDays || 0;
+      totals.sickDays += activity.sickDays || 0;
+      totals.lateDays += activity.lateDays || 0;
+
+      if (activity.detail && activity.detail.length > 0) {
+        totals.details = totals.details.concat(activity.detail);
+      }
+
+      return totals;
+    },
+    {
+      present: 0,
+      absent: 0,
+      permission: 0,
+      sick: 0,
+      late: 0,
+      presentDays: 0,
+      absentDays: 0,
+      permissionDays: 0,
+      sickDays: 0,
+      lateDays: 0,
+      details: [],
+      activities: activities,
+    },
+  );
+
+  const totalDaysResult = calculateTotalDays(activities, hariAktif);
+  totals.correctPresentDays = totalDaysResult.totalDays;
+  totals.correctPresentHours = totalDaysResult.totalHours;
+  totals.monthlyBreakdown = totalDaysResult.monthlyBreakdown;
+
+  if (hariAktif) {
+    let totalActiveDays = 0;
+    const uniqueMonths = getUniqueMonths(activities);
+    uniqueMonths.forEach((month) => {
+      const activeDays = getActiveDaysForMonth(hariAktif, month);
+      if (activeDays !== null) {
+        totalActiveDays += activeDays;
+      }
+    });
+
+    if (totalActiveDays > 0) {
+      const totalIdealHours = totalActiveDays * 10;
+      totals.totalPercentage =
+        totalIdealHours > 0
+          ? Math.round((totals.present / totalIdealHours) * 100)
+          : 0;
+    } else {
+      const totalEffective = totals.present + totals.absent + totals.permission;
+      totals.totalPercentage =
+        totalEffective > 0
+          ? Math.round((totals.present / totalEffective) * 100)
+          : 0;
+    }
+  } else {
+    const totalEffective = totals.present + totals.absent + totals.permission;
+    totals.totalPercentage =
+      totalEffective > 0
+        ? Math.round((totals.present / totalEffective) * 100)
+        : 0;
+  }
+
+  return totals;
+}
+
+// Fungsi menghitung persentase
 function calculatePercentage(present, absent, permission, sick, late) {
-  // Total pertemuan = hadir + alpa + izin (sakit dan terlambat tidak dihitung)
   const total = present + absent + permission;
   return total > 0 ? Math.round((present / total) * 100) : 0;
 }
 
-// Fungsi untuk membuat chart kehadiran dengan angka dan persentase
+// Fungsi menghitung persentase dengan hari_aktif
+function calculatePercentageWithActiveDays(
+  present,
+  absent,
+  permission,
+  sick,
+  late,
+  activeDays,
+  activityType,
+) {
+  if (!activeDays || activeDays === 0) {
+    return calculatePercentage(present, absent, permission, sick, late);
+  }
+
+  let hoursPerDay = 1;
+  const lowerActivity = activityType.toLowerCase();
+  if (lowerActivity.includes("kbm")) {
+    hoursPerDay = 8;
+  }
+
+  const totalPossibleHours = activeDays * hoursPerDay;
+  return totalPossibleHours > 0
+    ? Math.round((present / totalPossibleHours) * 100)
+    : 0;
+}
+
+// Fungsi membuat chart kehadiran
 function createAttendanceChart(present, absent, permission, sick, late) {
-  // Untuk chart, total semua termasuk sakit dan terlambat
   const total = present + absent + permission + sick + late;
   const presentPercent = total > 0 ? (present / total) * 100 : 0;
   const absentPercent = total > 0 ? (absent / total) * 100 : 0;
@@ -309,39 +569,7 @@ function createAttendanceChart(present, absent, permission, sick, late) {
   `;
 }
 
-// Fungsi untuk menghitung total statistik
-function calculateTotalStats(activities) {
-  return activities.reduce(
-    (totals, activity) => {
-      totals.present += activity.present;
-      totals.absent += activity.absent;
-      totals.permission += activity.permission;
-      totals.sick += activity.sick;
-      totals.late += activity.late || 0;
-      // Total hari
-      totals.presentDays += activity.presentDays || 0;
-      totals.absentDays += activity.absentDays || 0;
-      totals.permissionDays += activity.permissionDays || 0;
-      totals.sickDays += activity.sickDays || 0;
-      totals.lateDays += activity.lateDays || 0;
-      return totals;
-    },
-    {
-      present: 0,
-      absent: 0,
-      permission: 0,
-      sick: 0,
-      late: 0,
-      presentDays: 0,
-      absentDays: 0,
-      permissionDays: 0,
-      sickDays: 0,
-      lateDays: 0,
-    },
-  );
-}
-
-// FUNGSI BARU: Menghitung total per kegiatan
+// Fungsi menghitung total per kegiatan
 function calculateTotalPerActivity(activities) {
   const totals = {};
 
@@ -361,6 +589,7 @@ function calculateTotalPerActivity(activities) {
         sickDays: 0,
         lateDays: 0,
         count: 0,
+        details: [],
       };
     }
 
@@ -375,12 +604,16 @@ function calculateTotalPerActivity(activities) {
     totals[key].sickDays += activity.sickDays || 0;
     totals[key].lateDays += activity.lateDays || 0;
     totals[key].count += 1;
+
+    if (activity.detail && activity.detail.length > 0) {
+      totals[key].details = totals[key].details.concat(activity.detail);
+    }
   });
 
   return Object.values(totals);
 }
 
-// Fungsi untuk mendapatkan daftar bulan unik
+// Fungsi mendapatkan bulan unik
 function getUniqueMonths(activities) {
   const months = [...new Set(activities.map((a) => a.month))];
   const monthOrder = [
@@ -400,7 +633,7 @@ function getUniqueMonths(activities) {
   return months.sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
 }
 
-// Fungsi untuk mendapatkan ikon kegiatan
+// Fungsi mendapatkan ikon kegiatan
 function getActivityIcon(activity) {
   const lowerActivity = activity.toLowerCase();
   if (lowerActivity.includes("kbm")) return "fa-book";
@@ -411,7 +644,7 @@ function getActivityIcon(activity) {
   return "fa-tasks";
 }
 
-// Fungsi untuk mendapatkan warna badge kegiatan
+// Fungsi mendapatkan warna badge
 function getActivityBadgeColor(activity) {
   const lowerActivity = activity.toLowerCase();
   if (lowerActivity.includes("kbm")) return "badge-primary";
@@ -422,7 +655,7 @@ function getActivityBadgeColor(activity) {
   return "badge-secondary";
 }
 
-// Fungsi untuk mendapatkan info konversi per kegiatan
+// Fungsi mendapatkan info konversi
 function getActivityHoursInfo(activity) {
   const lowerActivity = activity.toLowerCase();
   if (lowerActivity.includes("kbm")) {
@@ -437,8 +670,214 @@ function getActivityHoursInfo(activity) {
   return "";
 }
 
-// FUNGSI BARU: Menampilkan total per kegiatan
-function displayTotalPerActivity(activities) {
+// Fungsi mendapatkan hari_aktif untuk bulan tertentu
+function getActiveDaysForMonth(hariAktif, month) {
+  if (!hariAktif) return null;
+
+  const monthLower = month.toLowerCase();
+
+  for (const [key, value] of Object.entries(hariAktif)) {
+    if (key.toLowerCase() === monthLower) {
+      return value;
+    }
+  }
+  return null;
+}
+
+// Fungsi render detail ketidakhadiran
+function renderAttendanceDetails(details) {
+  if (!details || details.length === 0) {
+    return '<span class="text-muted">Tidak ada catatan detail</span>';
+  }
+
+  const grouped = {};
+  details.forEach((d) => {
+    if (!grouped[d.keterangan]) {
+      grouped[d.keterangan] = [];
+    }
+    grouped[d.keterangan].push(d.tanggal);
+  });
+
+  let html = '<div class="detail-list">';
+  for (const [keterangan, dates] of Object.entries(grouped)) {
+    const badgeColor =
+      keterangan === "Alpa"
+        ? "danger"
+        : keterangan === "Izin"
+          ? "warning"
+          : keterangan === "Sakit"
+            ? "info"
+            : "secondary";
+    html += `
+      <div class="detail-item mb-1">
+        <span class="badge bg-${badgeColor} me-1">${keterangan}</span>
+        <span class="text-muted">${dates.join(", ")}</span>
+      </div>
+    `;
+  }
+  html += "</div>";
+  return html;
+}
+
+// FUNGSI BARU: Menampilkan statistik total dengan perhitungan hari yang benar
+function displayTotalStatistics(totals, hariAktif = null) {
+  const container = document.getElementById("totalStatistics");
+
+  if (!container) {
+    console.error("Element #totalStatistics tidak ditemukan!");
+    return;
+  }
+
+  container.innerHTML = "";
+
+  let html = `
+    <div class="card mt-3 mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistik Total Keseluruhan</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="stat-box bg-success text-white rounded p-3 text-center">
+              <h6><i class="fas fa-check-circle me-2"></i>Total Hadir</h6>
+              <h3>${totals.present} jam</h3>
+              <small>
+                ${formatDays(totals.correctPresentDays || totals.presentDays)}
+                <br>
+                <span class="text-warning">* Berdasarkan 1 hari = 10 jam (KBM 8j + PKB 1j + Sholat 1j)</span>
+              </small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="stat-box bg-danger text-white rounded p-3 text-center">
+              <h6><i class="fas fa-times-circle me-2"></i>Total Alpa</h6>
+              <h3>${totals.absent} jam</h3>
+              <small>${formatDays(totals.absentDays)}</small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="stat-box bg-warning text-white rounded p-3 text-center">
+              <h6><i class="fas fa-file-alt me-2"></i>Total Izin</h6>
+              <h3>${totals.permission} jam</h3>
+              <small>${formatDays(totals.permissionDays)}</small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="stat-box bg-info text-white rounded p-3 text-center">
+              <h6><i class="fas fa-ambulance me-2"></i>Total Sakit</h6>
+              <h3>${totals.sick} jam</h3>
+              <small>${formatDays(totals.sickDays)}</small>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="stat-box bg-secondary text-white rounded p-3 text-center">
+              <h6><i class="fas fa-clock me-2"></i>Total Terlambat</h6>
+              <h3>${totals.late} jam</h3>
+              <small>${formatDays(totals.lateDays)}</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="stat-box ${totals.totalPercentage >= 80 ? "bg-success" : totals.totalPercentage >= 60 ? "bg-warning text-dark" : "bg-danger"} text-white rounded p-3 text-center">
+              <h6><i class="fas fa-percent me-2"></i>Persentase Kehadiran Total</h6>
+              <h3>${totals.totalPercentage}%</h3>
+              <small>
+                ${totals.totalPercentage >= 80 ? "✅ Kehadiran Baik" : totals.totalPercentage >= 60 ? "⚠️ Perlu Ditingkatkan" : "❌ Perlu Perhatian Khusus"}
+                ${hariAktif ? "| Berdasarkan hari aktif" : ""}
+              </small>
+            </div>
+          </div>
+        </div>
+        
+        ${
+          totals.details && totals.details.length > 0
+            ? `
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6><i class="fas fa-list me-2"></i>Rekapitulasi Ketidakhadiran</h6>
+                ${renderAttendanceDetails(totals.details)}
+              </div>
+            </div>
+          </div>
+        </div>
+        `
+            : ""
+        }
+        
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6><i class="fas fa-table me-2"></i>Rekapitulasi Total</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Keterangan</th>
+                        <th>Jam</th>
+                        <th>Hari (Per Kegiatan)</th>
+                        <th>Hari (Gabungan)*</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="table-success">
+                        <td><i class="fas fa-check-circle me-1"></i>Hadir</td>
+                        <td><strong>${totals.present}</strong></td>
+                        <td>${formatDays(totals.presentDays)}</td>
+                        <td><strong>${formatDays(totals.correctPresentDays || totals.presentDays)}</strong></td>
+                      </tr>
+                      <tr class="table-danger">
+                        <td><i class="fas fa-times-circle me-1"></i>Alpa</td>
+                        <td>${totals.absent}</td>
+                        <td>${formatDays(totals.absentDays)}</td>
+                        <td>-</td>
+                      </tr>
+                      <tr class="table-warning">
+                        <td><i class="fas fa-file-alt me-1"></i>Izin</td>
+                        <td>${totals.permission}</td>
+                        <td>${formatDays(totals.permissionDays)}</td>
+                        <td>-</td>
+                      </tr>
+                      <tr class="table-info">
+                        <td><i class="fas fa-ambulance me-1"></i>Sakit</td>
+                        <td>${totals.sick}</td>
+                        <td>${formatDays(totals.sickDays)}</td>
+                        <td>-</td>
+                      </tr>
+                      <tr class="table-secondary">
+                        <td><i class="fas fa-clock me-1"></i>Terlambat</td>
+                        <td>${totals.late}</td>
+                        <td>${formatDays(totals.lateDays)}</td>
+                        <td>-</td>
+                      </tr>
+                      <tr class="table-primary">
+                        <td><strong><i class="fas fa-calculator me-1"></i>Total Efektif</strong></td>
+                        <td><strong>${totals.present + totals.absent + totals.permission}</strong></td>
+                        <td><strong>${formatDays(totals.presentDays + totals.absentDays + totals.permissionDays)}</strong></td>
+                        <td><strong>${formatDays(totals.correctPresentDays || totals.presentDays)}</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <small class="text-muted">
+                    * 1 hari = 8 jam KBM + 1 jam PKB + 1 jam Sholat = 10 jam/hari
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+// Fungsi menampilkan total per kegiatan - Diperbaiki untuk mobile
+function displayTotalPerActivity(activities, hariAktif = null) {
   const container = document.getElementById("totalPerActivity");
   container.innerHTML = "";
 
@@ -450,90 +889,161 @@ function displayTotalPerActivity(activities) {
     return;
   }
 
+  // Cek apakah perangkat mobile
+  const isMobile = window.innerWidth < 576;
+  const isTablet = window.innerWidth < 768;
+
   let html = `
     <div class="card mt-4">
-      <div class="card-header bg-secondary text-white">
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Total Per Kegiatan</h5>
+        <small class="text-light">
+          <i class="fas fa-arrows-alt-h me-1"></i>
+          ${isMobile ? "Geser untuk melihat semua" : ""}
+        </small>
       </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-striped table-hover">
+      <div class="card-body p-0">
+        <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table class="table table-striped table-hover mb-0" style="min-width: ${isMobile ? "650px" : "auto"};">
             <thead class="table-dark">
               <tr>
-                <th>No</th>
-                <th>Kegiatan</th>
+                <th style="position: sticky; left: 0; background: #212529; z-index: 2; min-width: 45px;">No</th>
+                <th style="position: sticky; left: 45px; background: #212529; z-index: 2; min-width: ${isMobile ? "100px" : "auto"};">Kegiatan</th>
+                ${
+                  !isMobile
+                    ? `
                 <th>Total Hadir</th>
                 <th>Total Alpa</th>
                 <th>Total Izin</th>
                 <th>Total Sakit</th>
                 <th>Total Terlambat</th>
-                <th>Jumlah Bulan</th>
-                <th>Rata-rata Persentase</th>
+                `
+                    : `
+                <th>Hadir / Alpa / Izin</th>
+                `
+                }
+                <th>Jml Bulan</th>
+                <th style="min-width: ${isMobile ? "100px" : "auto"};">Rata-rata %</th>
+                ${!isMobile ? `<th>Detail</th>` : ""}
               </tr>
             </thead>
             <tbody>
   `;
 
   totals.forEach((item, index) => {
-    const percentage = calculatePercentage(
-      item.present,
-      item.absent,
-      item.permission,
-      item.sick,
-      item.late,
-    );
+    let activeDays = null;
+    if (hariAktif) {
+      const months = activities
+        .filter((a) => a.activity === item.activity)
+        .map((a) => a.month);
+
+      const activeDaysList = months
+        .map((month) => getActiveDaysForMonth(hariAktif, month))
+        .filter((days) => days !== null);
+
+      if (activeDaysList.length > 0) {
+        activeDays = Math.round(
+          activeDaysList.reduce((a, b) => a + b, 0) / activeDaysList.length,
+        );
+      }
+    }
+
+    let percentage;
+    if (activeDays !== null && activeDays > 0) {
+      percentage = calculatePercentageWithActiveDays(
+        item.present,
+        item.absent,
+        item.permission,
+        item.sick,
+        item.late,
+        activeDays,
+        item.activity,
+      );
+    } else {
+      percentage = calculatePercentage(
+        item.present,
+        item.absent,
+        item.permission,
+        item.sick,
+        item.late,
+      );
+    }
 
     const icon = getActivityIcon(item.activity);
     const badgeColor = getActivityBadgeColor(item.activity);
     const hoursInfo = getActivityHoursInfo(item.activity);
+    const detailHtml = renderAttendanceDetails(item.details);
+
+    // Tentukan warna progress bar
+    const progressColor =
+      percentage >= 80
+        ? "bg-success"
+        : percentage >= 60
+          ? "bg-warning"
+          : "bg-danger";
 
     html += `
       <tr>
-        <td>${index + 1}</td>
-        <td>
-          <span class="badge ${badgeColor} badge-activity">
-            <i class="fas ${icon} me-1"></i>${item.activity}
+        <td style="position: sticky; left: 0; background: white; z-index: 1; font-weight: bold;">${index + 1}</td>
+        <td style="position: sticky; left: 45px; background: white; z-index: 1;">
+          <span class="badge ${badgeColor} badge-activity" style="font-size: ${isMobile ? "0.6rem" : "0.85rem"};">
+            <i class="fas ${icon} me-1"></i>${isMobile ? item.activity.substring(0, 15) + (item.activity.length > 15 ? "..." : "") : item.activity}
           </span>
           <br>
-          <small class="text-muted">${hoursInfo}</small>
+          <small class="text-muted" style="font-size: ${isMobile ? "0.55rem" : "0.75rem"};">${hoursInfo}</small>
+          ${activeDays ? `<br><small class="text-primary" style="font-size: ${isMobile ? "0.5rem" : "0.7rem"};">Hari aktif: ${activeDays}</small>` : ""}
         </td>
+        ${
+          !isMobile
+            ? `
         <td>
           <strong>${item.present}</strong> jam<br>
-          <small class="text-muted">(${formatDays(item.presentDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.presentDays)})</small>
         </td>
         <td>
           ${item.absent} jam<br>
-          <small class="text-muted">(${formatDays(item.absentDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.absentDays)})</small>
         </td>
         <td>
           ${item.permission} jam<br>
-          <small class="text-muted">(${formatDays(item.permissionDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.permissionDays)})</small>
         </td>
         <td>
           ${item.sick} jam<br>
-          <small class="text-muted">(${formatDays(item.sickDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.sickDays)})</small>
         </td>
         <td>
           ${item.late} jam<br>
-          <small class="text-muted">(${formatDays(item.lateDays)})</small>
+          <small class="text-muted" style="font-size: 0.7rem;">(${formatDays(item.lateDays)})</small>
         </td>
+        `
+            : `
+        <td style="font-size: 0.7rem;">
+          <div><span class="text-success">✔ ${item.present}</span> / <span class="text-danger">✘ ${item.absent}</span> / <span class="text-warning">📝 ${item.permission}</span></div>
+          <small class="text-muted">Sakit: ${item.sick} | Telat: ${item.late}</small>
+        </td>
+        `
+        }
         <td>${item.count}</td>
         <td>
-          <div class="d-flex align-items-center">
-            <span class="fw-bold me-2">${percentage}%</span>
-            <div class="progress flex-grow-1" style="height: 10px; width: 60px;">
-              <div class="progress-bar ${
-                percentage >= 80
-                  ? "bg-success"
-                  : percentage >= 60
-                    ? "bg-warning"
-                    : "bg-danger"
-              }" 
+          <div class="d-flex align-items-center" style="flex-direction: ${isMobile ? "column" : "row"}; gap: ${isMobile ? "2px" : "0"};">
+            <span class="fw-bold me-${isMobile ? "0" : "2"}" style="font-size: ${isMobile ? "0.7rem" : "1rem"};">${percentage}%</span>
+            <div class="progress" style="height: ${isMobile ? "6px" : "10px"}; width: ${isMobile ? "100%" : "60px"};">
+              <div class="progress-bar ${progressColor}" 
                    role="progressbar" style="width: ${percentage}%;" 
                    aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
           </div>
         </td>
+        ${
+          !isMobile
+            ? `
+        <td style="max-width: 150px;">
+          ${detailHtml}
+        </td>
+        `
+            : ""
+        }
       </tr>
     `;
   });
@@ -542,6 +1052,19 @@ function displayTotalPerActivity(activities) {
             </tbody>
           </table>
         </div>
+        ${
+          isMobile
+            ? `
+        <div class="p-2 bg-light border-top">
+          <small class="text-muted d-flex justify-content-between">
+            <span>✔ = Hadir</span>
+            <span>✘ = Alpa</span>
+            <span>📝 = Izin</span>
+          </small>
+        </div>
+        `
+            : ""
+        }
       </div>
     </div>
   `;
@@ -549,12 +1072,11 @@ function displayTotalPerActivity(activities) {
   container.innerHTML = html;
 }
 
-// Fungsi untuk menampilkan data kegiatan per bulan
-function displayMonthlyData(activities, activeMonth = null) {
+// Fungsi menampilkan data per bulan
+function displayMonthlyData(activities, activeMonth = null, hariAktif = null) {
   const monthlyDataContainer = document.getElementById("monthlyData");
   monthlyDataContainer.innerHTML = "";
 
-  // Filter kegiatan berdasarkan bulan yang dipilih
   let filteredActivities = activities;
   if (activeMonth) {
     filteredActivities = activities.filter((a) => a.month === activeMonth);
@@ -567,25 +1089,50 @@ function displayMonthlyData(activities, activeMonth = null) {
     return;
   }
 
-  // Tampilkan setiap kegiatan
-  filteredActivities.forEach((activity, index) => {
-    const percentage = calculatePercentage(
-      activity.present,
-      activity.absent,
-      activity.permission,
-      activity.sick,
-      activity.late || 0,
-    );
+  let activeDaysForMonth = null;
+  if (hariAktif && activeMonth) {
+    activeDaysForMonth = getActiveDaysForMonth(hariAktif, activeMonth);
+  }
 
-    // Hitung total pertemuan efektif untuk info
+  if (activeDaysForMonth !== null) {
+    const infoHtml = `
+      <div class="alert alert-info mb-3">
+        <i class="fas fa-calendar-alt me-2"></i>
+        <strong>Hari Aktif ${activeMonth}:</strong> ${activeDaysForMonth} hari
+        <small class="text-muted ms-2">(1 hari = 10 jam: 8j KBM + 1j PKB + 1j Sholat)</small>
+      </div>
+    `;
+    monthlyDataContainer.innerHTML += infoHtml;
+  }
+
+  filteredActivities.forEach((activity) => {
+    let percentage;
+    if (activeDaysForMonth !== null && activeDaysForMonth > 0) {
+      percentage = calculatePercentageWithActiveDays(
+        activity.present,
+        activity.absent,
+        activity.permission,
+        activity.sick,
+        activity.late || 0,
+        activeDaysForMonth,
+        activity.activity,
+      );
+    } else {
+      percentage = calculatePercentage(
+        activity.present,
+        activity.absent,
+        activity.permission,
+        activity.sick,
+        activity.late || 0,
+      );
+    }
+
     const totalEffective =
       activity.present + activity.absent + activity.permission;
-
     const icon = getActivityIcon(activity.activity);
     const badgeColor = getActivityBadgeColor(activity.activity);
     const hoursInfo = getActivityHoursInfo(activity.activity);
 
-    // Tentukan status berdasarkan persentase
     let statusText, statusIcon, statusClass;
     if (percentage >= 80) {
       statusText = "Kehadiran Baik";
@@ -601,12 +1148,12 @@ function displayMonthlyData(activities, activeMonth = null) {
       statusClass = "text-danger";
     }
 
-    // Format tampilan hari
     const presentDisplay = formatDays(activity.presentDays);
     const absentDisplay = formatDays(activity.absentDays);
     const permissionDisplay = formatDays(activity.permissionDays);
     const sickDisplay = formatDays(activity.sickDays);
     const lateDisplay = formatDays(activity.lateDays);
+    const detailHtml = renderAttendanceDetails(activity.detail);
 
     const activityCard = `
       <div class="card month-card fade-in mb-3">
@@ -619,6 +1166,13 @@ function displayMonthlyData(activities, activeMonth = null) {
             <span class="badge badge-light ms-2" style="font-size: 0.7rem;">
               <i class="fas fa-clock me-1"></i>${hoursInfo}
             </span>
+            ${
+              activeDaysForMonth
+                ? `<span class="badge badge-info ms-2" style="font-size: 0.7rem;">
+              <i class="fas fa-calendar me-1"></i>Hari aktif: ${activeDaysForMonth}
+            </span>`
+                : ""
+            }
           </div>
           <div>
             <span class="text-muted me-3">Persentase: ${percentage}%</span>
@@ -661,6 +1215,23 @@ function displayMonthlyData(activities, activeMonth = null) {
             </div>
           </div>
           
+          ${
+            activity.detail && activity.detail.length > 0
+              ? `
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <h6><i class="fas fa-list me-2"></i>Detail Ketidakhadiran</h6>
+                  ${detailHtml}
+                </div>
+              </div>
+            </div>
+          </div>
+          `
+              : ""
+          }
+          
           <div class="row mt-4">
             <div class="col-md-6">
               <div class="card bg-light">
@@ -683,6 +1254,7 @@ function displayMonthlyData(activities, activeMonth = null) {
                   </small>
                   <small class="text-muted d-block">
                     * ${hoursInfo}
+                    ${activeDaysForMonth ? `| Hari aktif: ${activeDaysForMonth} hari` : ""}
                   </small>
                 </div>
               </div>
@@ -700,14 +1272,6 @@ function displayMonthlyData(activities, activeMonth = null) {
                       activity.late || 0,
                     )}
                   </div>
-                  <div class="row mt-2 text-center mb-2">
-                    <div class="col-6">
-                      <small class="text-danger"></small>
-                    </div>
-                    <div class="col-6">
-                      <small class="text-success"></small>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -719,16 +1283,14 @@ function displayMonthlyData(activities, activeMonth = null) {
     monthlyDataContainer.innerHTML += activityCard;
   });
 
-  // TAMPILKAN TOTAL PER KEGIATAN DI BAWAH DATA BULANAN
-  displayTotalPerActivity(filteredActivities);
+  displayTotalPerActivity(filteredActivities, hariAktif);
 }
 
-// Fungsi untuk membuat tombol pemilih bulan
-function createMonthSelector(activities, activeMonth = null) {
+// Fungsi membuat pemilih bulan
+function createMonthSelector(activities, activeMonth = null, hariAktif = null) {
   const monthSelector = document.getElementById("monthSelector");
   monthSelector.innerHTML = "";
 
-  // Tambahkan tombol "Semua"
   const allButton = document.createElement("button");
   allButton.type = "button";
   allButton.className = `month-btn ${!activeMonth ? "active" : ""}`;
@@ -738,99 +1300,141 @@ function createMonthSelector(activities, activeMonth = null) {
       btn.classList.remove("active");
     });
     allButton.classList.add("active");
-    displayMonthlyData(activities, null);
+    displayMonthlyData(activities, null, hariAktif);
   });
   monthSelector.appendChild(allButton);
 
-  // Tambahkan tombol per bulan unik
   const uniqueMonths = getUniqueMonths(activities);
   uniqueMonths.forEach((month) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `month-btn ${month === activeMonth ? "active" : ""}`;
-    button.textContent = `📅 ${month}`;
+
+    let monthLabel = `📅 ${month}`;
+    if (hariAktif) {
+      const activeDays = getActiveDaysForMonth(hariAktif, month);
+      if (activeDays !== null) {
+        monthLabel += ` (${activeDays} hari)`;
+      }
+    }
+    button.textContent = monthLabel;
+
     button.addEventListener("click", () => {
       document.querySelectorAll(".month-btn").forEach((btn) => {
         btn.classList.remove("active");
       });
       button.classList.add("active");
-      displayMonthlyData(activities, month);
+      displayMonthlyData(activities, month, hariAktif);
     });
     monthSelector.appendChild(button);
   });
 }
 
-// Fungsi untuk reset pencarian
+// Fungsi reset pencarian
 function resetSearch() {
-  document.querySelector(".result-box").style.display = "none";
-  document.getElementById("studentId").value = "";
-  document.getElementById("studentId").focus();
+  const resultBox = document.querySelector(".result-box");
+  const studentId = document.getElementById("studentId");
+
+  if (resultBox) resultBox.style.display = "none";
+  if (studentId) {
+    studentId.value = "";
+    studentId.focus();
+  }
 }
 
 // Event listener untuk form pencarian
-document
-  .getElementById("searchForm")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const studentId = document.getElementById("studentId").value.trim();
-
-    if (!studentId) {
-      alert("Silakan masukkan NIUP santri");
-      return;
-    }
-
-    const student = await searchStudent(studentId);
-
-    if (student) {
-      // Menampilkan data siswa
-      document.getElementById("resultId").textContent = student.id;
-      document.getElementById("resultName").textContent = student.name;
-      document.getElementById("resultClass").textContent = student.class;
-      document.getElementById("resultYear").textContent = student.year;
-      document.getElementById("resultStatus").textContent = student.status;
-
-      // Hitung dan tampilkan total statistik
-      const totals = calculateTotalStats(student.activities);
-      document.getElementById("totalPresent").textContent =
-        totals.present + " jam (" + formatDays(totals.presentDays) + ")";
-      document.getElementById("totalAbsent").textContent =
-        totals.absent + " jam (" + formatDays(totals.absentDays) + ")";
-      document.getElementById("totalPermission").textContent =
-        totals.permission + " jam (" + formatDays(totals.permissionDays) + ")";
-      document.getElementById("totalSick").textContent =
-        totals.sick + " jam (" + formatDays(totals.sickDays) + ")";
-      document.getElementById("totalLate").textContent =
-        totals.late + " jam (" + formatDays(totals.lateDays) + ")";
-
-      // Buat pemilih bulan
-      createMonthSelector(student.activities);
-
-      // Tampilkan semua kegiatan
-      displayMonthlyData(student.activities);
-
-      // Menampilkan hasil pencarian
-      document.querySelector(".result-box").style.display = "block";
-
-      // Scroll ke hasil
-      document
-        .querySelector(".result-box")
-        .scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      alert(
-        "Data siswa tidak ditemukan. Silakan periksa kembali NIUP yang dimasukkan.",
-      );
-    }
-  });
-
-// Focus ke input field saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("studentId").focus();
+  const searchForm = document.getElementById("searchForm");
+  const studentIdInput = document.getElementById("studentId");
 
-  // Tambahkan event listener untuk tutup dengan ESC
+  if (studentIdInput) {
+    studentIdInput.focus();
+  }
+
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       resetSearch();
     }
   });
+
+  // Detect resize untuk refresh tabel
+  let resizeTimeout;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function () {
+      const resultBox = document.querySelector(".result-box");
+      if (resultBox && resultBox.style.display === "block") {
+        const studentId = studentIdInput ? studentIdInput.value.trim() : "";
+        if (studentId) {
+          searchForm.dispatchEvent(new Event("submit"));
+        }
+      }
+    }, 500);
+  });
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const studentId = studentIdInput ? studentIdInput.value.trim() : "";
+
+      if (!studentId) {
+        alert("Silakan masukkan NIUP santri");
+        return;
+      }
+
+      console.log("Mencari siswa dengan ID:", studentId);
+
+      const student = await searchStudent(studentId);
+
+      if (student) {
+        console.log("Data ditemukan:", student);
+
+        const resultId = document.getElementById("resultId");
+        const resultName = document.getElementById("resultName");
+        const resultClass = document.getElementById("resultClass");
+        const resultYear = document.getElementById("resultYear");
+        const resultStatus = document.getElementById("resultStatus");
+
+        if (resultId) resultId.textContent = student.id;
+        if (resultName) resultName.textContent = student.name;
+        if (resultClass) resultClass.textContent = student.class;
+        if (resultYear) resultYear.textContent = student.year;
+        if (resultStatus) resultStatus.textContent = student.status;
+
+        const totals = calculateTotalStats(
+          student.activities,
+          student.hari_aktif || null,
+        );
+
+        displayTotalStatistics(totals, student.hari_aktif || null);
+
+        createMonthSelector(
+          student.activities,
+          null,
+          student.hari_aktif || null,
+        );
+
+        displayMonthlyData(
+          student.activities,
+          null,
+          student.hari_aktif || null,
+        );
+
+        const resultBox = document.querySelector(".result-box");
+        if (resultBox) {
+          resultBox.style.display = "block";
+          resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      } else {
+        alert(
+          "Data siswa tidak ditemukan. Silakan periksa kembali NIUP yang dimasukkan.\n\n" +
+            "Data dummy yang tersedia:\n" +
+            DUMMY_DATA.map((s) => `- ${s.id}: ${s.name}`).join("\n"),
+        );
+      }
+    });
+  } else {
+    console.error("Form #searchForm tidak ditemukan!");
+  }
 });

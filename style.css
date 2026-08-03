@@ -1,3 +1,9 @@
+/* style.css - Perbaikan untuk mobile responsive */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: #f8f9fa;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -92,11 +98,15 @@ body {
   }
 
   .header h1 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+  }
+
+  .header h3 {
+    font-size: 1rem;
   }
 
   .header .lead {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -124,7 +134,102 @@ body {
   display: none;
 }
 
-/* Attendance Chart */
+/* ========== STAT BOX - Untuk Statistik Total ========== */
+.stat-box {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 1rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-box h3 {
+  margin: 5px 0;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.stat-box h6 {
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.stat-box small {
+  opacity: 0.9;
+  font-size: 0.75rem;
+}
+
+.stat-box small .text-warning {
+  color: #ffd700 !important;
+  font-size: 0.65rem;
+}
+
+/* Warna Stat Box */
+.stat-box.bg-success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  color: white;
+}
+
+.stat-box.bg-danger {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white;
+}
+
+.stat-box.bg-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+  color: white;
+}
+
+.stat-box.bg-info {
+  background: linear-gradient(135deg, #1abc9c, #16a085) !important;
+  color: white;
+}
+
+.stat-box.bg-secondary {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  color: white;
+}
+
+.stat-box.bg-primary {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  color: white;
+}
+
+/* ========== DETAIL LIST ========== */
+.detail-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.detail-item {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item .badge {
+  min-width: 50px;
+  font-size: 0.75rem;
+}
+
+/* ========== ATTENDANCE CHART ========== */
 .attendance-chart {
   height: 140px;
   display: flex;
@@ -132,6 +237,7 @@ body {
   justify-content: space-around;
   margin-top: 1rem;
   position: relative;
+  padding: 0 0.5rem;
 }
 
 .chart-bar {
@@ -143,6 +249,7 @@ body {
   align-items: center;
   transition: all 0.3s ease;
   cursor: help;
+  min-height: 20px;
 }
 
 .chart-bar:hover {
@@ -159,6 +266,12 @@ body {
   font-size: 0.9rem;
   font-weight: bold;
   white-space: nowrap;
+}
+
+.chart-value .chart-percent {
+  font-size: 0.7rem;
+  font-weight: normal;
+  color: #6c757d;
 }
 
 .chart-label {
@@ -179,16 +292,19 @@ body {
   top: -40px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.85);
   color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
+  padding: 5px 12px;
+  border-radius: 6px;
   font-size: 0.75rem;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
   z-index: 1000;
+  pointer-events: none;
 }
 
 .chart-bar:hover::after {
@@ -196,69 +312,117 @@ body {
   visibility: visible;
 }
 
-/* Percentage Display */
+/* Chart Bar Backgrounds */
+.chart-bar.bg-success {
+  background: linear-gradient(180deg, #2ecc71, #27ae60) !important;
+}
+
+.chart-bar.bg-danger {
+  background: linear-gradient(180deg, #e74c3c, #c0392b) !important;
+}
+
+.chart-bar.bg-warning {
+  background: linear-gradient(180deg, #f39c12, #e67e22) !important;
+}
+
+.chart-bar.bg-info {
+  background: linear-gradient(180deg, #1abc9c, #16a085) !important;
+}
+
+.chart-bar.bg-secondary {
+  background: linear-gradient(180deg, #95a5a6, #7f8c8d) !important;
+}
+
+/* ========== PERCENTAGE DISPLAY ========== */
 .percentage-display {
   font-size: 2.5rem;
   font-weight: bold;
   color: #2ecc71;
 }
 
-/* Button Search */
+/* ========== BUTTON SEARCH ========== */
 .btn-search {
   background: linear-gradient(135deg, #3498db, #8e44ad);
   border: none;
-  padding: 10px 25px;
+  padding: 12px 30px;
   border-radius: 50px;
   font-weight: bold;
   transition: all 0.3s;
   color: white;
+  font-size: 1.1rem;
 }
 
 .btn-search:hover {
   transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
   color: white;
 }
 
-/* Footer */
+.btn-search:active {
+  transform: scale(0.95);
+}
+
+/* ========== FOOTER ========== */
 .footer {
   margin-top: 3rem;
   padding: 1.5rem 0;
-  background-color: #343a40;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
   color: white;
   border-radius: 20px 20px 0 0;
 }
 
-/* Info Box */
+/* ========== INFO BOX ========== */
 .info-box {
   background: linear-gradient(135deg, #2ecc71, #3498db);
   color: white;
   border-radius: 10px;
-  padding: 1rem;
+  padding: 1.5rem;
   margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
-/* Month Card */
+.info-box h4 {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 576px) {
+  .info-box {
+    padding: 1rem;
+  }
+  .info-box h4 {
+    font-size: 1rem;
+  }
+  .info-box p {
+    font-size: 0.9rem;
+  }
+}
+
+/* ========== MONTH CARD ========== */
 .month-card {
   border-left: 5px solid #3498db;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .month-card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-bottom: 1px solid #dee2e6;
   font-weight: bold;
+  padding: 0.75rem 1.25rem;
 }
 
 .badge-month {
   background: linear-gradient(135deg, #3498db, #8e44ad);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
 }
 
-/* Badge Activity */
+/* ========== BADGE ACTIVITY ========== */
 .badge-activity {
   font-size: 0.85rem;
-  padding: 0.3rem 0.6rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 20px;
   transition: all 0.3s ease;
 }
@@ -293,60 +457,82 @@ body {
   color: white;
 }
 
-/* Chart Bar Backgrounds */
-.chart-bar.bg-secondary {
-  background: linear-gradient(135deg, #6c757d, #495057) !important;
-}
-
-/* Month Selector */
+/* ========== MONTH SELECTOR ========== */
 .month-selector {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 0.5rem;
+  padding: 0.5rem;
 }
 
 .month-btn {
   background-color: #e9ecef;
   border: none;
   border-radius: 20px;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.2rem;
   font-size: 0.9rem;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  color: #495057;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .month-btn:hover {
   background-color: #dee2e6;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .month-btn.active {
   background: linear-gradient(135deg, #3498db, #8e44ad);
   color: white;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
-/* Loading Spinner */
+.month-btn.active:hover {
+  box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+/* ========== LOADING SPINNER ========== */
 .loading-spinner {
   display: none;
   text-align: center;
-  padding: 2rem;
+  padding: 3rem;
 }
 
-/* Total Stats */
+.loading-spinner .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ========== TOTAL STATS (Lama - untuk kompatibilitas) ========== */
 .total-stats {
   background: linear-gradient(135deg, #f39c12, #e74c3c);
   color: white;
   border-radius: 10px;
-  padding: 1rem;
+  padding: 1.5rem;
   margin-bottom: 1rem;
 }
 
-/* Progress Bar */
-.progress {
-  border-radius: 10px;
+.total-stats h4 {
+  font-size: 1.8rem;
+  font-weight: bold;
 }
 
-/* Tables */
+/* ========== PROGRESS BAR ========== */
+.progress {
+  border-radius: 10px;
+  overflow: hidden;
+  height: 20px !important;
+}
+
+.progress-bar {
+  transition: width 1s ease-in-out;
+}
+
+/* ========== TABLES ========== */
 .table-borderless th {
   font-weight: 600;
   color: #495057;
@@ -364,37 +550,149 @@ body {
   color: #2c3e50;
 }
 
-/* Badge Indicators */
+/* ========== TABLE RESPONSIVE - MOBILE ========== */
+
+/* Sticky header untuk scroll horizontal */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Style untuk tabel di mobile */
+@media (max-width: 768px) {
+  .table-responsive {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .table-responsive table {
+    font-size: 0.75rem;
+  }
+
+  .table-responsive table thead th {
+    font-size: 0.65rem;
+    padding: 0.4rem 0.3rem;
+    white-space: nowrap;
+  }
+
+  .table-responsive table tbody td {
+    font-size: 0.7rem;
+    padding: 0.3rem;
+    vertical-align: middle;
+  }
+
+  /* Sticky column shadow */
+  .table-responsive table td:first-child,
+  .table-responsive table th:first-child {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .table-responsive table td:nth-child(2),
+  .table-responsive table th:nth-child(2) {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Untuk mobile sangat kecil */
+@media (max-width: 576px) {
+  .table-responsive table {
+    font-size: 0.65rem;
+    min-width: 500px;
+  }
+
+  .table-responsive table thead th {
+    font-size: 0.55rem;
+    padding: 0.3rem 0.2rem;
+  }
+
+  .table-responsive table tbody td {
+    font-size: 0.6rem;
+    padding: 0.2rem;
+  }
+
+  .badge-activity {
+    font-size: 0.5rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+}
+
+/* Card header mobile */
+@media (max-width: 576px) {
+  .card-header.bg-secondary {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .card-header.bg-secondary h5 {
+    font-size: 0.8rem;
+  }
+
+  .card-header.bg-secondary small {
+    font-size: 0.6rem;
+  }
+
+  .card-body.p-0 {
+    padding: 0 !important;
+  }
+}
+
+/* ========== BADGE INDICATORS ========== */
 .badge.bg-danger.ms-1,
 .badge.bg-warning.ms-1,
 .badge.bg-secondary.ms-1,
 .badge.bg-info.ms-1 {
   font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
+  padding: 0.2rem 0.5rem;
 }
 
-/* Responsive */
+/* ========== RESPONSIVE - TABLET ========== */
+@media (max-width: 992px) {
+  .stat-box h3 {
+    font-size: 1.5rem;
+  }
+
+  .stat-box h6 {
+    font-size: 0.8rem;
+  }
+
+  .stat-box small {
+    font-size: 0.7rem;
+  }
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 1.5rem 0;
   }
 
   .header h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  .header h3 {
+    font-size: 1.1rem;
   }
 
   .search-box {
     padding: 1.5rem;
   }
 
+  .search-box h3 {
+    font-size: 1.2rem;
+  }
+
   .month-selector {
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 0.5rem;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
   }
 
   .month-btn {
-    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+    flex-shrink: 0;
   }
 
   .attendance-chart {
@@ -406,13 +704,30 @@ body {
   }
 
   .chart-value {
-    font-size: 0.8rem;
-    top: -22px;
+    font-size: 0.75rem;
+    top: -20px;
   }
 
   .chart-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     bottom: -25px;
+  }
+
+  .stat-box {
+    min-height: 80px;
+    padding: 0.75rem !important;
+  }
+
+  .stat-box h3 {
+    font-size: 1.3rem;
+  }
+
+  .stat-box h6 {
+    font-size: 0.7rem;
+  }
+
+  .stat-box small {
+    font-size: 0.65rem;
   }
 
   .total-stats .col-md-2 {
@@ -422,57 +737,365 @@ body {
   .total-stats .col-md-2:last-child {
     margin-bottom: 0;
   }
-}
 
-@media (max-width: 576px) {
-  .attendance-chart {
-    height: 100px;
+  .percentage-display {
+    font-size: 2rem;
   }
 
-  .chart-bar {
-    width: 35px;
-  }
-
-  .chart-value {
-    font-size: 0.7rem;
-    top: -18px;
-  }
-
-  .chart-label {
-    font-size: 0.6rem;
-    bottom: -22px;
+  .table-bordered th,
+  .table-bordered td {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
   }
 
   .badge-activity {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.4rem;
-    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
   }
 
-  .badge.ms-1 {
-    display: inline-block;
-    margin-top: 2px;
-    font-size: 0.6rem;
+  .badge-month {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
   }
 
   .month-card-header {
-    flex-direction: column;
-    align-items: flex-start !important;
+    padding: 0.5rem 0.75rem;
+    flex-wrap: wrap;
   }
 
   .month-card-header .text-muted {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .month-card-header .text-success,
   .month-card-header .text-warning,
   .month-card-header .text-danger {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 }
 
-/* Animations */
+/* ========== RESPONSIVE - MOBILE ========== */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .header {
+    padding: 1rem 0;
+    min-height: 100px;
+  }
+
+  .header h1 {
+    font-size: 1rem;
+  }
+
+  .header h3 {
+    font-size: 0.9rem;
+  }
+
+  .header .lead {
+    font-size: 0.75rem;
+  }
+
+  .logo {
+    width: 60px;
+  }
+
+  .search-box {
+    padding: 1rem;
+  }
+
+  .search-box h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem !important;
+  }
+
+  .btn-search {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .attendance-chart {
+    height: 80px;
+    padding: 0;
+  }
+
+  .chart-bar {
+    width: 28px;
+  }
+
+  .chart-value {
+    font-size: 0.6rem;
+    top: -16px;
+  }
+
+  .chart-value .chart-percent {
+    font-size: 0.5rem;
+  }
+
+  .chart-label {
+    font-size: 0.5rem;
+    bottom: -18px;
+  }
+
+  .chart-bar::after {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    top: -32px;
+    white-space: normal;
+    max-width: 100px;
+  }
+
+  .stat-box {
+    min-height: 60px;
+    padding: 0.5rem !important;
+    border-radius: 8px;
+  }
+
+  .stat-box h3 {
+    font-size: 1rem;
+    margin: 2px 0;
+  }
+
+  .stat-box h6 {
+    font-size: 0.6rem;
+    margin-bottom: 4px;
+  }
+
+  .stat-box small {
+    font-size: 0.55rem;
+  }
+
+  .stat-box small .text-warning {
+    font-size: 0.5rem;
+    display: block;
+  }
+
+  .percentage-display {
+    font-size: 1.6rem;
+  }
+
+  .badge-activity {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .badge-month {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .badge.badge-light.ms-2 {
+    font-size: 0.5rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .badge.badge-info.ms-2 {
+    font-size: 0.5rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .month-card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.3rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .month-card-header > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    align-items: center;
+  }
+
+  .month-card-header > div:last-child {
+    font-size: 0.7rem;
+  }
+
+  .month-card-header .text-muted {
+    font-size: 0.65rem;
+    margin-top: 0;
+  }
+
+  .month-card-header .text-success,
+  .month-card-header .text-warning,
+  .month-card-header .text-danger {
+    font-size: 0.65rem;
+  }
+
+  .month-card .card-body {
+    padding: 0.75rem;
+  }
+
+  .month-card .table-borderless th {
+    font-size: 0.7rem;
+    width: 50% !important;
+  }
+
+  .month-card .table-borderless td {
+    font-size: 0.7rem;
+  }
+
+  .month-card .table-borderless td strong {
+    font-size: 0.75rem;
+  }
+
+  .month-card .table-borderless td .text-muted {
+    font-size: 0.6rem;
+  }
+
+  .detail-item {
+    font-size: 0.7rem;
+    padding: 2px 0;
+  }
+
+  .detail-item .badge {
+    font-size: 0.6rem;
+    min-width: 35px;
+  }
+
+  .table-bordered th,
+  .table-bordered td {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.3rem;
+  }
+
+  .table-bordered th i,
+  .table-bordered td i {
+    font-size: 0.6rem;
+  }
+
+  .table-responsive {
+    border-radius: 6px;
+  }
+
+  .card.bg-light .card-body {
+    padding: 0.5rem;
+  }
+
+  .card.bg-light .card-body h6 {
+    font-size: 0.75rem;
+  }
+
+  .progress {
+    height: 14px !important;
+  }
+
+  .progress .progress-bar {
+    font-size: 0.6rem;
+  }
+
+  .footer {
+    padding: 1rem 0;
+    font-size: 0.8rem;
+  }
+
+  .footer p {
+    margin-bottom: 0;
+  }
+
+  /* Panduan */
+  .card-header.bg-info h5 {
+    font-size: 0.9rem;
+  }
+
+  .card-body ol,
+  .card-body ul {
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .card-body ol li,
+  .card-body ul li {
+    margin-bottom: 0.3rem;
+  }
+
+  .card-body h6 {
+    font-size: 0.9rem;
+  }
+}
+
+/* ========== RESPONSIVE - VERY SMALL MOBILE ========== */
+@media (max-width: 400px) {
+  .header h1 {
+    font-size: 0.85rem;
+  }
+
+  .header h3 {
+    font-size: 0.75rem;
+  }
+
+  .header .lead {
+    font-size: 0.65rem;
+  }
+
+  .logo {
+    width: 50px;
+  }
+
+  .stat-box h3 {
+    font-size: 0.85rem;
+  }
+
+  .stat-box h6 {
+    font-size: 0.55rem;
+  }
+
+  .stat-box small {
+    font-size: 0.5rem;
+  }
+
+  .percentage-display {
+    font-size: 1.3rem;
+  }
+
+  .month-btn {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .chart-bar {
+    width: 22px;
+  }
+
+  .chart-value {
+    font-size: 0.5rem;
+    top: -14px;
+  }
+
+  .chart-label {
+    font-size: 0.45rem;
+    bottom: -15px;
+  }
+
+  .badge-activity {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+  }
+
+  .badge-month {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.3rem;
+  }
+
+  .table-bordered th,
+  .table-bordered td {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.2rem;
+  }
+
+  .month-card .table-borderless th {
+    font-size: 0.6rem;
+  }
+
+  .month-card .table-borderless td {
+    font-size: 0.6rem;
+  }
+}
+
+/* ========== ANIMATIONS ========== */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -488,7 +1111,41 @@ body {
   }
 }
 
-/* Custom Scrollbar */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-box {
+  animation: slideUp 0.6s ease-out;
+}
+
+.stat-box:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stat-box:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stat-box:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stat-box:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.stat-box:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.stat-box:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* ========== CUSTOM SCROLLBAR ========== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -500,15 +1157,15 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: linear-gradient(135deg, #3498db, #8e44ad);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: linear-gradient(135deg, #2980b9, #7d3c98);
 }
 
-/* Utility */
+/* ========== UTILITY ========== */
 .text-success,
 .text-warning,
 .text-danger {
@@ -518,4 +1175,71 @@ body {
 /* Legend untuk chart */
 .attendance-chart + .row small {
   font-size: 0.7rem;
+}
+
+/* Table rekap total */
+.table-bordered th,
+.table-bordered td {
+  vertical-align: middle;
+}
+
+.table-bordered .table-success {
+  background-color: #d4edda !important;
+}
+
+.table-bordered .table-danger {
+  background-color: #f8d7da !important;
+}
+
+.table-bordered .table-warning {
+  background-color: #fff3cd !important;
+}
+
+.table-bordered .table-info {
+  background-color: #d1ecf1 !important;
+}
+
+.table-bordered .table-secondary {
+  background-color: #e2e3e5 !important;
+}
+
+.table-bordered .table-primary {
+  background-color: #cce5ff !important;
+  font-weight: bold;
+}
+
+/* Hover effect untuk table */
+.table-bordered tbody tr:hover {
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+/* Card dalam card untuk detail */
+.card.bg-light {
+  background-color: #f8f9fa !important;
+  border: 1px solid #e9ecef;
+}
+
+/* Badge detail di tabel */
+.detail-item .badge {
+  min-width: 45px;
+  font-size: 0.7rem;
+}
+
+/* Alert info */
+.alert-info {
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+}
+
+@media (max-width: 576px) {
+  .alert-info {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .alert-info .text-muted {
+    font-size: 0.65rem;
+    display: block;
+    margin-top: 0.2rem;
+  }
 }
