@@ -470,22 +470,31 @@ function calculateTotalStats(activities, hariAktif = null) {
 
     if (totalActiveDays > 0) {
       const totalIdealHours = totalActiveDays * 10;
+      // PERUBAHAN: Sakit ditambahkan ke nilai hadir agar persentase tidak turun
+      const creditedPresent = totals.present + totals.sick;
+
       totals.totalPercentage =
         totalIdealHours > 0
-          ? Math.round((totals.present / totalIdealHours) * 100)
+          ? parseFloat(((creditedPresent / totalIdealHours) * 100).toFixed(2))
           : 0;
     } else {
-      const totalEffective = totals.present + totals.absent + totals.permission;
+      const totalEffective =
+        totals.present + totals.absent + totals.permission + totals.sick;
+      const creditedPresent = totals.present + totals.sick;
+
       totals.totalPercentage =
         totalEffective > 0
-          ? Math.round((totals.present / totalEffective) * 100)
+          ? parseFloat(((creditedPresent / totalEffective) * 100).toFixed(2))
           : 0;
     }
   } else {
-    const totalEffective = totals.present + totals.absent + totals.permission;
+    const totalEffective =
+      totals.present + totals.absent + totals.permission + totals.sick;
+    const creditedPresent = totals.present + totals.sick;
+
     totals.totalPercentage =
       totalEffective > 0
-        ? Math.round((totals.present / totalEffective) * 100)
+        ? parseFloat(((creditedPresent / totalEffective) * 100).toFixed(2))
         : 0;
   }
 
@@ -494,8 +503,14 @@ function calculateTotalStats(activities, hariAktif = null) {
 
 // Fungsi menghitung persentase
 function calculatePercentage(present, absent, permission, sick, late) {
-  const total = present + absent + permission;
-  return total > 0 ? Math.round((present / total) * 100) : 0;
+  // Masukkan sakit ke total efektif keseluruhan
+  const total = present + absent + permission + sick;
+  // Sakit dianggap "kredit hadir"
+  const creditedPresent = present + sick;
+
+  return total > 0
+    ? parseFloat(((creditedPresent / total) * 100).toFixed(2))
+    : 0;
 }
 
 // Fungsi menghitung persentase dengan hari_aktif
@@ -519,8 +534,11 @@ function calculatePercentageWithActiveDays(
   }
 
   const totalPossibleHours = activeDays * hoursPerDay;
+  // Sakit dianggap "kredit hadir" agar persentase tidak dirugikan
+  const creditedPresent = present + sick;
+
   return totalPossibleHours > 0
-    ? Math.round((present / totalPossibleHours) * 100)
+    ? parseFloat(((creditedPresent / totalPossibleHours) * 100).toFixed(2))
     : 0;
 }
 
@@ -657,16 +675,6 @@ function getActivityBadgeColor(activity) {
 
 // Fungsi mendapatkan info konversi
 function getActivityHoursInfo(activity) {
-  const lowerActivity = activity.toLowerCase();
-  // if (lowerActivity.includes("kbm")) {
-  //   return "1 hari = 8 jam";
-  // } else if (
-  //   lowerActivity.includes("pembiasaan") ||
-  //   lowerActivity.includes("pkb") ||
-  //   lowerActivity.includes("sholat")
-  // ) {
-  //   return "1 hari = 1 jam";
-  // }
   return "";
 }
 
@@ -743,7 +751,6 @@ function displayTotalStatistics(totals, hariAktif = null) {
               <h3>${totals.present} jam</h3>
               <small>
                 ${formatDays(totals.correctPresentDays || totals.presentDays)}
-                
               </small>
             </div>
           </div>
@@ -805,8 +812,6 @@ function displayTotalStatistics(totals, hariAktif = null) {
         `
             : ""
         }
-        
-       
       </div>
     </div>
   `;
@@ -829,13 +834,11 @@ function displayTotalPerActivity(activities, hariAktif = null) {
 
   // Cek apakah perangkat mobile
   const isMobile = window.innerWidth < 576;
-  const isTablet = window.innerWidth < 768;
 
   let html = `
     <div class="card mt-4">
       <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center mb-1">
         <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Total Per Kegiatan</h5>
-      
       </div>
       <div class="card-body p-0">
         <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -987,13 +990,6 @@ function displayTotalPerActivity(activities, hariAktif = null) {
             </tbody>
           </table>
         </div>
-        ${
-          isMobile
-            ? `
-       
-        `
-            : ""
-        }
       </div>
     </div>
   `;
@@ -1057,7 +1053,7 @@ function displayMonthlyData(activities, activeMonth = null, hariAktif = null) {
     }
 
     const totalEffective =
-      activity.present + activity.absent + activity.permission;
+      activity.present + activity.absent + activity.permission + activity.sick;
     const icon = getActivityIcon(activity.activity);
     const badgeColor = getActivityBadgeColor(activity.activity);
     const hoursInfo = getActivityHoursInfo(activity.activity);
@@ -1240,12 +1236,6 @@ function createMonthSelector(activities, activeMonth = null, hariAktif = null) {
     button.className = `month-btn ${month === activeMonth ? "active" : ""}`;
 
     let monthLabel = `📅 ${month}`;
-    if (hariAktif) {
-      const activeDays = getActiveDaysForMonth(hariAktif, month);
-      // if (activeDays !== null) {
-      //   monthLabel += ` (${activeDays} hari)`;
-      // }
-    }
     button.textContent = monthLabel;
 
     button.addEventListener("click", () => {
