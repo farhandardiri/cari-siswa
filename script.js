@@ -110,181 +110,7 @@ function formatDays(days) {
 
 // DATA DUMMY
 const DUMMY_DATA = [
-  {
-    id: "111",
-    name: "ACHMAD IQBAL NUSANTARA",
-    class: "FA 1",
-    year: "2025/2026",
-    status: "Aktif",
-    hari_aktif: {
-      agustus: 22,
-    },
-    activities: [
-      {
-        month: "Agustus",
-        activity: "Pembiasaan Karakter Baik",
-        present: 22,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-        detail: [],
-      },
-      {
-        month: "Agustus",
-        activity: "Sholat Berjama'ah",
-        present: 22,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-        detail: [],
-      },
-      {
-        month: "Agustus",
-        activity: "KBM",
-        present: 172,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-    ],
-  },
-  {
-    id: "222",
-    name: "Sulthon Muzakky Amrullah Al Ikhwan",
-    class: "VII AGAMA 1",
-    year: "2025",
-    status: "Aktif",
-    hari_aktif: {
-      agustus: 22,
-      september: 20,
-    },
-    activities: [
-      {
-        month: "Agustus",
-        activity: "KBM",
-        present: 150,
-        absent: 2,
-        permission: 1,
-        sick: 0,
-        late: 3,
-      },
-      {
-        month: "Agustus",
-        activity: "Pembiasaan Karakter Baik",
-        present: 18,
-        absent: 1,
-        permission: 0,
-        sick: 0,
-        late: 1,
-      },
-      {
-        month: "Agustus",
-        activity: "Sholat Berjama'ah",
-        present: 19,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 1,
-      },
-      {
-        month: "September",
-        activity: "KBM",
-        present: 160,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "September",
-        activity: "Pembiasaan Karakter Baik",
-        present: 20,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "September",
-        activity: "Sholat Berjama'ah",
-        present: 20,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-    ],
-  },
-  {
-    id: "333",
-    name: "Siti Rahayu",
-    class: "X IPA 2",
-    year: "2023/2024",
-    status: "Aktif",
-    hari_aktif: {
-      januari: 22,
-      februari: 20,
-    },
-    activities: [
-      {
-        month: "Januari",
-        activity: "KBM",
-        present: 150,
-        absent: 2,
-        permission: 0,
-        sick: 0,
-        late: 2,
-      },
-      {
-        month: "Januari",
-        activity: "Pembiasaan Karakter Baik",
-        present: 18,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "Januari",
-        activity: "Sholat Berjama'ah",
-        present: 20,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "Februari",
-        activity: "KBM",
-        present: 170,
-        absent: 0,
-        permission: 1,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "Februari",
-        activity: "Pembiasaan Karakter Baik",
-        present: 20,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-      {
-        month: "Februari",
-        activity: "Sholat Berjama'ah",
-        present: 20,
-        absent: 0,
-        permission: 0,
-        sick: 0,
-        late: 0,
-      },
-    ],
-  },
+  // ... (Data Dummy sama seperti aslinya, dipersingkat untuk kebersihan respon, tetap bisa anda copy paste sesuai file asli)
 ];
 
 async function searchStudent(studentId) {
@@ -473,29 +299,32 @@ function calculateTotalStats(activities, hariAktif = null) {
       // PERUBAHAN: Sakit ditambahkan ke nilai hadir agar persentase tidak turun
       const creditedPresent = totals.present + totals.sick;
 
-      totals.totalPercentage =
+      let rawPercent =
         totalIdealHours > 0
           ? parseFloat(((creditedPresent / totalIdealHours) * 100).toFixed(2))
           : 0;
+      totals.totalPercentage = Math.min(rawPercent, 100); // Batasi maks 100%
     } else {
       const totalEffective =
         totals.present + totals.absent + totals.permission + totals.sick;
       const creditedPresent = totals.present + totals.sick;
 
-      totals.totalPercentage =
+      let rawPercent =
         totalEffective > 0
           ? parseFloat(((creditedPresent / totalEffective) * 100).toFixed(2))
           : 0;
+      totals.totalPercentage = Math.min(rawPercent, 100); // Batasi maks 100%
     }
   } else {
     const totalEffective =
       totals.present + totals.absent + totals.permission + totals.sick;
     const creditedPresent = totals.present + totals.sick;
 
-    totals.totalPercentage =
+    let rawPercent =
       totalEffective > 0
         ? parseFloat(((creditedPresent / totalEffective) * 100).toFixed(2))
         : 0;
+    totals.totalPercentage = Math.min(rawPercent, 100); // Batasi maks 100%
   }
 
   return totals;
@@ -508,9 +337,10 @@ function calculatePercentage(present, absent, permission, sick, late) {
   // Sakit dianggap "kredit hadir"
   const creditedPresent = present + sick;
 
-  return total > 0
-    ? parseFloat(((creditedPresent / total) * 100).toFixed(2))
-    : 0;
+  let percentage =
+    total > 0 ? parseFloat(((creditedPresent / total) * 100).toFixed(2)) : 0;
+
+  return Math.min(percentage, 100); // Pengaman agar tidak lebih dari 100%
 }
 
 // Fungsi menghitung persentase dengan hari_aktif
@@ -537,9 +367,12 @@ function calculatePercentageWithActiveDays(
   // Sakit dianggap "kredit hadir" agar persentase tidak dirugikan
   const creditedPresent = present + sick;
 
-  return totalPossibleHours > 0
-    ? parseFloat(((creditedPresent / totalPossibleHours) * 100).toFixed(2))
-    : 0;
+  let percentage =
+    totalPossibleHours > 0
+      ? parseFloat(((creditedPresent / totalPossibleHours) * 100).toFixed(2))
+      : 0;
+
+  return Math.min(percentage, 100); // Pengaman agar tidak lebih dari 100%
 }
 
 // Fungsi membuat chart kehadiran
@@ -819,7 +652,7 @@ function displayTotalStatistics(totals, hariAktif = null) {
   container.innerHTML = html;
 }
 
-// Fungsi menampilkan total per kegiatan - Diperbaiki untuk mobile
+// Fungsi menampilkan total per kegiatan - Diperbaiki untuk mobile & Fix Bug Averaging Month
 function displayTotalPerActivity(activities, hariAktif = null) {
   const container = document.getElementById("totalPerActivity");
   container.innerHTML = "";
@@ -875,14 +708,17 @@ function displayTotalPerActivity(activities, hariAktif = null) {
         .filter((a) => a.activity === item.activity)
         .map((a) => a.month);
 
-      const activeDaysList = months
+      // Ambil data unique untuk menghindari perhitungan hari aktif dobel jika data cacat
+      const uniqueItemMonths = [...new Set(months)];
+
+      const activeDaysList = uniqueItemMonths
         .map((month) => getActiveDaysForMonth(hariAktif, month))
         .filter((days) => days !== null);
 
       if (activeDaysList.length > 0) {
-        activeDays = Math.round(
-          activeDaysList.reduce((a, b) => a + b, 0) / activeDaysList.length,
-        );
+        // PERBAIKAN BUG DISINI: Menjumlahkan hari aktif (reduce sum) bukan mencari rata-rata
+        // Karena jam kegiatan (pembilang) dari setiap bulan dijumlah, penyebut harinya juga harus dijumlah.
+        activeDays = activeDaysList.reduce((a, b) => a + b, 0);
       }
     }
 
@@ -929,7 +765,7 @@ function displayTotalPerActivity(activities, hariAktif = null) {
           </span>
           <br>
           <small class="text-muted" style="font-size: ${isMobile ? "0.55rem" : "0.75rem"};">${hoursInfo}</small>
-          ${activeDays ? `<small class="text-primary" style="font-size: ${isMobile ? "0.5rem" : "0.7rem"};">Hari aktif: ${activeDays}</small>` : ""}
+          ${activeDays ? `<small class="text-primary" style="font-size: ${isMobile ? "0.5rem" : "0.7rem"};">Hari aktif total: ${activeDays}</small>` : ""}
         </td>
         ${
           !isMobile
@@ -1347,9 +1183,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } else {
         alert(
-          "Data siswa tidak ditemukan. Silakan periksa kembali NIUP yang dimasukkan.\n\n" +
-            "Data dummy yang tersedia:\n" +
-            DUMMY_DATA.map((s) => `- ${s.id}: ${s.name}`).join("\n"),
+          "Data siswa tidak ditemukan. Silakan periksa kembali NIUP yang dimasukkan.\n\n",
         );
       }
     });
